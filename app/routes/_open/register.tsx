@@ -1,16 +1,14 @@
-import React, { use, useCallback, useState } from "react";
-import StepUserAccount from "../../components/user/stepUserAccount";
-import StepUserInfo from "~/components/user/stepUserInfo";
-import StepPetRelatedInfo from "~/components/user/stepPetRelatedInfo";
-import StepONGAccount from "~/components/ong/stepONGAccount";
-import StepONGInfo from "~/components/ong/stepONGInfo";
+import React, { useState, useEffect } from "react";
+import StepUserAccount from "../../components/user/StepUserAccount";
+import StepUserInfo from "~/components/user/StepUserInfo";
+import StepPetRelatedInfo from "~/components/user/StepPetRelatedInfo";
+import StepONGAccount from "~/components/ong/StepONGAccount";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router";
 
 export default function Register() {
-  // alterar aqui depois
-  const { register, isAuthenticated, user, loading } = useAuthContext();
-  const [userType, setUserType] = useState<"user" | "ong" | null>(null);
+  const { isAuthenticated, user, loading } = useAuthContext();
   const [stepIndex, setStepIndex] = useState(0);
   const nextStep = () => setStepIndex((prev) => prev + 1);
   const prevStep = () => setStepIndex((prev) => prev - 1);
@@ -19,45 +17,70 @@ export default function Register() {
     <StepUserInfo nextStep={nextStep} prevStep={prevStep} />,
     <StepPetRelatedInfo prevStep={prevStep} />,
   ];
-  const ongSteps = [
-    <StepONGAccount nextStep={nextStep} />,
-    <StepONGInfo prevStep={prevStep} />,
-  ];
-  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    register(
-      data.get("name") as string,
-      data.get("email") as string,
-      data.get("password") as string
-    );
+
+  useEffect(() => {
+    const json = sessionStorage.getItem("user-signup-state");
+    if (!json) {
+      return;
+    }
+    const existingData = JSON.parse(json);
+    if (existingData?.step1) {
+      if (existingData?.step2) {
+        if (!existingData?.step1 && !existingData?.step2) {
+          setStepIndex(0);
+        }
+        setStepIndex(2);
+      } else {
+        setStepIndex(1);
+      }
+    }
   }, []);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      navigate("/");
+    }
+  }, [isAuthenticated, loading]);
+
   return (
     <div className="bg-background-secondary w-screen h-screen flex justify-center items-center">
       <div>
-        {loading && <p>Carregando...</p>}
-        {isAuthenticated && <p>Você está logado como {user?.email}</p>}
-        <img
-          src="/logo.svg"
-          alt="logo"
-          className="absolute top-4 left-4 w-50"
-        />
-        <Tabs
-          defaultValue="user"
-          className="max-w-[396px] flex items-center"
-          onValueChange={() => setStepIndex(0)}
-        >
-          <TabsList className="bg-gray-200">
-            <TabsTrigger value="user" className="w-[198px]">
-              Adotante
-            </TabsTrigger>
-            <TabsTrigger value="ong" className="w-[198px]">
-              ONG
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="user">{userSteps[stepIndex]}</TabsContent>
-          <TabsContent value="ong">{ongSteps[stepIndex]}</TabsContent>
-        </Tabs>
+        {loading ? (
+          <img src="/tube-spinner.svg" alt="Spinner" className="w-15" />
+        ) : (
+          <>
+            <img
+              src="/logo.svg"
+              alt="logo"
+              className="absolute top-4 left-4 w-50"
+            />
+            <Tabs
+              defaultValue="user"
+              className="max-w-[396px] flex items-center"
+              onValueChange={() => setStepIndex(0)}
+            >
+              <TabsList className="bg-gray-200">
+                <TabsTrigger
+                  value="user"
+                  className="w-[198px] text-background-secondary"
+                >
+                  Adotante
+                </TabsTrigger>
+                <TabsTrigger
+                  value="ong"
+                  className="w-[198px] text-background-secondary"
+                >
+                  ONG
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="user">{userSteps[stepIndex]}</TabsContent>
+              <TabsContent value="ong">
+                <StepONGAccount />
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
       </div>
     </div>
   );

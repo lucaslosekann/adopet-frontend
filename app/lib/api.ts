@@ -9,7 +9,31 @@ export const loginRequest = async (email: string, password: string) => {
     return response.data;
 };
 
-export const registerRequest = async (data: { email: string; password: string; name: string }) => {
+export const registerONGRequest = async (data: { cnpj: string,
+    pixKey: string,
+    email: string,
+    password: string }) => {
+    const response = await instance.post("/ongs/", data);
+    return response.data;
+};
+
+export const registerAdoptantRequest = async (data: { email: string;
+    password: string;
+    name: string;
+    cpf: string;
+    phoneNumber: string;
+    postalCode: string;
+    uf: string;
+    city: string;
+    neighborhood: string;
+    street: string;
+    number: string;
+    complement: string;
+    petPreference: string[];
+    size: string;
+    expenseRange: string;
+    isActive: boolean;
+    isGoodWithKids: boolean; }) => {
     const response = await instance.post("/auth/register", data);
     return response.data;
 };

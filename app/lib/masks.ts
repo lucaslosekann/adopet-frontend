@@ -42,3 +42,10 @@ export function maskCEP(value: string): string {
     .replace(/(\d{3})(\d)/, "$1$2")
     .replace(/(-\d{3})\d+?$/, "$1"); //limitar 9 digitos
 }
+
+export function maskUF(value: string): string {
+  return value
+  .replace(/[^a-zA-Z]/g, "")
+  .replace(/^([a-zA-Z]{2})[a-zA-Z]+$/, "$1").toUpperCase(); //limitar 2 letras
+}
+
