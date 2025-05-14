@@ -2,15 +2,14 @@ import React, { use, useCallback } from "react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Link } from "react-router";
+import Header from "~/components/Header";
 
 //{JSON.stringify(props.params.id)}
 
 export default function AdopterProfile() {
     return (
         <div className="bg-white w-screen h-screen flex flex-col">
-            <header className="bg-background-secondary p-4 w-full">
-                <img src="/logo.svg" alt="logo" className="w-50 mx-auto" />
-            </header>
+            <Header/>
             <div className="flex flex-col justify-center items-center text-center mt-7">
                         <h1 className="font-secondary text-background-secondary text-2xl">Meu Perfil</h1>
                         <img src="/ngo_profile_icon.png" alt="ngo_profile_icon" className="w-40 rounded-2xl border-5 border-background-secondary mt-2"/>

@@ -2,15 +2,14 @@ import React, { use, useCallback } from "react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Link } from "react-router";
+import Header from "~/components/Header";
 
 //{JSON.stringify(props.params.id)}
 
 export default function NgoProfile() {
     return (
         <div className="bg-white w-screen h-screen flex flex-col">
-            <header className="bg-background-secondary p-4 w-full fixed top-0 left-0">
-                <img src="/logo.svg" alt="logo" className="w-50 mx-auto" />
-            </header>
+            <Header/>
             <div className="flex flex-grow justify-center items-center text-center">
                 <div>
                     <div className="flex items-start text-start justify-center">
