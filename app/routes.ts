@@ -8,5 +8,7 @@ export default [
         route("ong/:id", "./routes/_open/ngo_profile.tsx"),
         route("adotante/:id", "./routes/_open/adopter_profile.tsx"),
         route("adocao/:petId", "./routes/_open/adoption_profile.tsx"),
+        route("register", "./routes/_open/register.tsx")
     ]),
+    
 ] satisfies RouteConfig;
