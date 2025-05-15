@@ -73,3 +73,32 @@ export const getPet = async (petId: string) => {
     const response = await instance.get<Pet>(`/pets/${petId}`);
     return response.data;
 };
+
+
+type Ong ={
+  id: string
+  phone: string
+  cnpj: string
+  pixKey: string
+  about: string | null
+  createdAt: string
+  updatedAt: string
+  address: {
+    id: string
+    street: string
+    number: string
+    neighborhood: string
+    city: string
+    uf: string
+    postalCode: string
+    createdAt: string
+    updatedAt: string
+  }
+  email: string
+  name: string
+}
+
+export const getOng = async (ongId: string) => {
+    const response = await instance.get<Ong>(`/ongs/${ongId}`);
+    return response.data;
+}
