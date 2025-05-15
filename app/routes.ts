@@ -5,5 +5,6 @@ export default [
     layout("./routes/_open/open-layout.tsx", [
         route("login", "./routes/_open/login.tsx"),
         route("adocao/:petId", "./routes/_open/adoption_profile.tsx"),
+        route("pesquisa", "./routes/_open/pet_search.tsx")
     ]),
 ] satisfies RouteConfig;
