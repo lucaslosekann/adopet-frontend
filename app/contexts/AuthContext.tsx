@@ -47,7 +47,7 @@ type RegisterAdoptantData = {
 
 // Create the context
 export type AuthContextProps = {
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string, rememberMe: boolean) => void;
   registerONG: (
     cnpj: string,
     pixKey: string,
@@ -100,13 +100,23 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const LoginMutation = useMutation({
     mutationKey: ["login"],
-    mutationFn: ({ email, password }: { email: string; password: string }) => {
+    mutationFn: ({
+      email,
+      password,
+      rememberMe,
+    }: {
+      email: string;
+      password: string;
+      rememberMe: boolean;
+    }) => {
       return loginRequest(email, password);
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       setUser(data.user);
       instance.defaults.headers["Authorization"] = data.token;
-      localStorage.setItem("adopet-token", data.token);
+      if (variables.rememberMe) {
+        localStorage.setItem("adopet-token", data.token);
+      }
       navigate("/");
     },
     onError: (error) => {
@@ -130,6 +140,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       instance.defaults.headers["Authorization"] = data.token;
       localStorage.setItem("adopet-token", data.token);
+      navigate("/");
     },
     onError: (error) => {
       let message = "Tente novamente mais tarde";
@@ -150,6 +161,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       instance.defaults.headers["Authorization"] = data.token;
       localStorage.setItem("adopet-token", data.token);
+      navigate("/");
     },
     onError: (error) => {
       let message = "Tente novamente mais tarde";
@@ -164,9 +176,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
-  const login = useCallback(async (email: string, password: string) => {
-    await LoginMutation.mutateAsync({ email, password });
-  }, []);
+  const login = useCallback(
+    async (email: string, password: string, rememberMe: boolean) => {
+      await LoginMutation.mutateAsync({ email, password, rememberMe });
+    },
+    []
+  );
 
   const registerONG = useCallback(
     async (cnpj: string, pixKey: string, email: string, password: string) => {
