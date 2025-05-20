@@ -32,7 +32,6 @@ export default function Login() {
           <img src="/tube-spinner.svg" alt="Spinner" className="w-15" />
         ) : (
           <>
-            {isAuthenticated && <p>Você está logado como {user?.email}</p>}
             <img
               src="/logo.svg"
               alt="logo"
