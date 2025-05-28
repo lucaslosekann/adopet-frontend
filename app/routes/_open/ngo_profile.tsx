@@ -47,7 +47,7 @@ export default function NgoProfile(props: {
         generateQrCode();
     }, [ong]);
 
-    if (OngQuery.isError && (OngQuery.error as AxiosError).response?.status === 404) {
+    if ((OngQuery.isError && (OngQuery.error as AxiosError).response?.status === 404) || !ong) {
         return (
             <div className="bg-white w-screen h-screen flex flex-col">
                 <Header />
@@ -66,7 +66,7 @@ export default function NgoProfile(props: {
         );
     }
 
-    if (OngQuery.isLoading || !ong) {
+    if (OngQuery.isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <Spinner color="#000000" className="w-20 h-20" />
@@ -79,7 +79,7 @@ export default function NgoProfile(props: {
             <Header />
             <div className="flex flex-grow justify-center items-center text-center">
                 <div>
-                    <div className="flex items-start text-start justify-center">
+                    <div className="flex items-start text-start justify-center mt-3">
                         <img
                             src="/ngo_profile_icon.png"
                             alt="ngo_profile_icon"
@@ -93,19 +93,19 @@ export default function NgoProfile(props: {
                             </h1>
                         </div>
                     </div>
-                    <div className="flex flex-col mt-3">
+                    <div className="flex flex-col mt-3 items-center">
                         <h1 className="font-secondary text-background-secondary text-2xl">Sobre a ONG</h1>
                         <p className="text-background-secondary mt-1 font-semibold">
                             {ong.about ?? 'Nenhuma descrição informada.'}
                         </p>
-                        <h1 className="font-secondary text-background-secondary text-2xl mt-7">Dados</h1>
+                        <h1 className="font-secondary text-background-secondary text-2xl mt-4">Dados</h1>
                         <p className="text-background-secondary mt-1 font-semibold">{ong.phone}</p>
                         <p className="text-background-secondary mt-1 font-semibold">{ong.email}</p>
                         <p className="text-background-secondary mt-1 font-semibold">CNPJ {ong.cnpj}</p>
                         <p className="text-background-secondary mt-1 font-normal">
                             Última atualização: {getDataFormatada(ong.updatedAt)}.
                         </p>
-                        <h1 className="font-secondary text-background-secondary text-2xl mt-7">Nos visite!</h1>
+                        <h1 className="font-secondary text-background-secondary text-2xl mt-4">Nos visite!</h1>
                         <p className="text-background-secondary mt-1 font-semibold">
                             {ong.address.city}, {ong.address.uf} - {ong.address.neighborhood}
                         </p>
@@ -113,7 +113,8 @@ export default function NgoProfile(props: {
                             {ong.address.street}, {ong.address.number}
                         </p>
                         <p className="text-background-secondary font-normal">CEP: {ong.address.postalCode}</p>
-                        {qrCodeBase64 && <img src={qrCodeBase64} />}
+                        <h1 className="font-secondary text-background-secondary text-2xl mt-4">Doar Faz Bem!</h1>
+                        {qrCodeBase64 && <img className="max-h-40" src={qrCodeBase64} />}
                     </div>
                 </div>
             </div>
