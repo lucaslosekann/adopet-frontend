@@ -1,4 +1,5 @@
-import React, { use, useCallback } from "react";
+import React, { use, useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -7,11 +8,23 @@ import { useAuthContext } from "../../contexts/AuthContext";
 
 export default function Login() {
   const { login, isAuthenticated, user, loading } = useAuthContext();
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    login(data.get("email") as string, data.get("password") as string);
+    login(
+      data.get("email") as string,
+      data.get("password") as string,
+      data.get("remember-me") === "on"
+    );
   }, []);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      navigate("/");
+    }
+  }, [isAuthenticated, loading]);
+
   return (
     <div className="bg-background-secondary w-screen h-screen flex justify-center items-center">
       <div>
@@ -19,7 +32,6 @@ export default function Login() {
           <img src="/tube-spinner.svg" alt="Spinner" className="w-15" />
         ) : (
           <>
-            {isAuthenticated && <p>Você está logado como {user?.email}</p>}
             <img
               src="/logo.svg"
               alt="logo"
@@ -39,6 +51,7 @@ export default function Login() {
                       className="w-full bg-transparent placeholder:text-gray-600 text-slate-700 text-sm border border-gray-300 rounded-md px-3 py-2 
                                 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                       placeholder="Email"
+                      name="email"
                     />
                   </div>
                   <div className="w-[320px]">
@@ -47,12 +60,17 @@ export default function Login() {
                                 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                       placeholder="Senha"
                       type="password"
+                      name="password"
                     />
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="terms" className="border-gray-300" />
+                    <Checkbox
+                      id="remember-me"
+                      className="border-gray-300"
+                      name="remember-me"
+                    />
                     <label
-                      htmlFor="terms"
+                      htmlFor="remember-me"
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       Lembrar de mim

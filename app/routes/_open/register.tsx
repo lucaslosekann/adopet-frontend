@@ -17,7 +17,6 @@ export default function Register() {
     <StepUserInfo nextStep={nextStep} prevStep={prevStep} />,
     <StepPetRelatedInfo prevStep={prevStep} />,
   ];
-
   useEffect(() => {
     const json = sessionStorage.getItem("user-signup-state");
     if (!json) {
@@ -35,7 +34,6 @@ export default function Register() {
       }
     }
   }, []);
-
   const navigate = useNavigate();
   useEffect(() => {
     if (isAuthenticated && !loading) {

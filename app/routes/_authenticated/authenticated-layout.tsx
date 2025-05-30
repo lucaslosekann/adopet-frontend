@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useNavigate } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useEffect } from 'react';
 export function Layout({ children }: { children: React.ReactNode }) {
