@@ -134,3 +134,22 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes progress-pulse {
+  0% {
+    width: var(--start-progress);
+  }
+  35% {
+    width: var(--start-progress);
+  }
+  80% {
+    width: var(--progress-target);
+  }
+  100% {
+    width: var(--progress-target);
+  }
+}
+
+.animate-progress {
+  animation: progress-pulse 4s ease-in-out infinite;
+}
