@@ -152,7 +152,7 @@ export default function StepPetRelatedInfo({
           <div className="flex items-center gap-4">
             <div className="flex gap-2">
               <RadioGroup
-                onValueChange={(value) => setIsActive(value)}
+                onValueChange={(value:any) => setIsActive(value)}
                 value={isActive}
               >
                 <div className="flex items-center space-x-2">
@@ -189,7 +189,7 @@ export default function StepPetRelatedInfo({
           </div>
           <div className="flex items-center gap-4">
             <RadioGroup
-              onValueChange={(value) => setIsGoodWithKids(value)}
+              onValueChange={(value:any) => setIsGoodWithKids(value)}
               value={isGoodWithKids}
             >
               <div className="flex items-center space-x-2">

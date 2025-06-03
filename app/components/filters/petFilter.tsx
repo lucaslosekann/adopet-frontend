@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import ExpandableFilter from "./expandableFilter";
 import MultiSelectCheckbox from "./multiSelectCheckBox";
+import MultiSelect from "../MultiSelect";
 
 //o filtro "raça" somente aparecer quando for selecionada alguma especie
 
-const especiesOptions = ["Cachorro", "Gato", "Coelho", "Hamster"];
+const especiesOptions = ["Cachorro", "Gato", "Coelho", "Hamster", "Cobra", "Furão", "Papagaio"];
 
 const racaMap: Record<string, string[]> = {
     Cachorro: ["Bulldog", "Poodle", "Labrador", "Beagle", "SRD"],
@@ -37,73 +38,77 @@ const PetFilter = () => {
     }, [especies]);
 
     return (
-        <div className="bg-slate-200 p-6 rounded-2xl space-y-4 max-w-6xl mx-auto mb-8">
-            <ExpandableFilter title="Espécie">
-                <MultiSelectCheckbox
-                    options={especiesOptions}
-                    selectedOptions={especies}
-                    onChange={setEspecies}
-                />
-            </ExpandableFilter>
+        <div className="bg-slate-300 p-6 rounded-2xl max-w-6xl mx-auto mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            {especies.length > 0 && (
-                <ExpandableFilter title="Raça">
+                <ExpandableFilter title="Espécie">
                     <MultiSelectCheckbox
-                        options={racasFiltradas}
-                        selectedOptions={racas}
-                        onChange={setRacas}
+                        options={especiesOptions}
+                        selectedOptions={especies}
+                        onChange={setEspecies}
                     />
                 </ExpandableFilter>
-            )}
 
-            <ExpandableFilter title="Porte">
-                <MultiSelectCheckbox
-                    options={porteOptions}
-                    selectedOptions={portes}
-                    onChange={setPortes}
-                />
-            </ExpandableFilter>
+                {especies.length > 0 && (
+                    <ExpandableFilter title="Raça">
+                        <MultiSelectCheckbox
+                            options={racasFiltradas}
+                            selectedOptions={racas}
+                            onChange={setRacas}
+                        />
+                    </ExpandableFilter>
+                )}
 
-            <ExpandableFilter title="Sexo">
-                <MultiSelectCheckbox
-                    options={sexoOptions}
-                    selectedOptions={sexo}
-                    onChange={setSexo}
-                />
-            </ExpandableFilter>
+                <ExpandableFilter title="Porte">
+                    <MultiSelectCheckbox
+                        options={porteOptions}
+                        selectedOptions={portes}
+                        onChange={setPortes}
+                    />
+                </ExpandableFilter>
 
-            <ExpandableFilter title="Castrado">
-                <MultiSelectCheckbox
-                    options={castradoOptions}
-                    selectedOptions={castrado}
-                    onChange={setCastrado}
-                />
-            </ExpandableFilter>
+                <ExpandableFilter title="Sexo">
+                    <MultiSelectCheckbox
+                        options={sexoOptions}
+                        selectedOptions={sexo}
+                        onChange={setSexo}
+                    />
+                </ExpandableFilter>
 
-            <ExpandableFilter title="Ordenar">
-                <div className="space-y-2">
-                    {ordenarOptions.map((option) => (
-                        <label key={option} className="flex items-center space-x-2">
-                            <input
-                                type="radio"
-                                name="ordenar"
-                                value={option}
-                                checked={ordenar === option}
-                                onChange={() => setOrdenar(option)}
-                            />
-                            <span>{option}</span>
-                        </label>
-                    ))}
-                </div>
-            </ExpandableFilter>
+                <ExpandableFilter title="Castrado">
+                    <MultiSelectCheckbox
+                        options={castradoOptions}
+                        selectedOptions={castrado}
+                        onChange={setCastrado}
+                    />
+                </ExpandableFilter>
 
-            <div className="flex justify-end pt-4">
-                <button className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-600">
-                    Buscar
+                <ExpandableFilter title="Ordenar">
+                    <div className="space-y-2">
+                        {ordenarOptions.map((option) => (
+                            <label key={option} className="flex items-center space-x-2">
+                                <input
+                                    type="radio"
+                                    name="ordenar"
+                                    value={option}
+                                    checked={ordenar === option}
+                                    onChange={() => setOrdenar(option)}
+                                />
+                                <span>{option}</span>
+                            </label>
+                        ))}
+                    </div>
+                </ExpandableFilter>
+            </div>
+
+            <div className="flex justify-end mt-6">
+                <button className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-700 transition">
+                    BUSCAR
                 </button>
             </div>
         </div>
     );
+
 };
 
 export default PetFilter;

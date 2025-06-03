@@ -20,9 +20,10 @@ const MultiSelectCheckbox: React.FC<MultiSelectCheckboxProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    // Mude esta linha:
+    <div className="flex flex-col gap-2"> {/* Alterado de 'flex flex-wrap gap-2' para 'flex flex-col gap-2' */}
       {options.map((opt) => (
-        <label key={opt} className="flex items-center space-x-1">
+        <label key={opt} className="flex items-center space-x-2"> {/* Alterado 'space-x-1' para 'space-x-2' para um pouco mais de espaço */}
           <input
             type="checkbox"
             checked={selectedOptions.includes(opt)}

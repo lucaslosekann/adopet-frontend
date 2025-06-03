@@ -1,20 +1,23 @@
 import React from "react";
-//transformar o nome do pet como clicavel
+import { Link } from "react-router-dom";
 
 interface PetCardProps {
     nome: string;
     imagem: string;
 }
 
-const petCard = ({nome, imagem}: PetCardProps) => {
+const PetCard = ({ nome, imagem }: PetCardProps) => {
     return (
-        <div className="flex flex-col items-center rounded-2x1 overflow-hidden shadow-md">
-            <img src={imagem} alt={nome} className="w-40 h-40 object-cover"/>
-            <div className="bg-slate-200 w-full py-2 text-center font-bold text-blue-900 rounded-b-2x1">
+        <Link
+            to={`/pets/${nome}`} // ou algum ID
+            className="flex flex-col items-center rounded-2xl overflow-hidden shadow-lg bg-white w-44 hover:shadow-xl transition"
+        >
+            <img src={imagem} alt={nome} className="w-44 h-44 object-cover" />
+            <div className="bg-slate-200 w-full py-2 text-center font-secondary text-background-secondary">
                 {nome.toUpperCase()}
             </div>
-        </div>
+        </Link>
     );
 };
 
-export default petCard;
+export default PetCard;
