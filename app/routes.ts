@@ -4,6 +4,7 @@ export default [
     layout('./routes/_authenticated/authenticated-layout.tsx', [
         index('./routes/_authenticated/_index.tsx'),
         route('meuperfil', './routes/_authenticated/adopter_profile.tsx'),
+        route('analisedoc', './routes/_authenticated/doc_analysis.tsx'),
     ]),
     layout('./routes/_open/open-layout.tsx', [
         route('login', './routes/_open/login.tsx'),
