@@ -7,6 +7,17 @@ export function maskCPF(value: string): string {
     .replace(/(-\d{2})\d+?$/, "$1"); // limitar 11 digitos
 }
 
+export function isValidCPF(value: string): boolean {
+    value = value.replace(/[^\d]+/g, '');
+    if (value.length !== 11 || !!value.match(/(\d)\1{10}/)) return false;
+    const numbers = value.split('').map(Number);
+    const validator = numbers.slice(-2);
+    const toValidate = (pop: number) => numbers.slice(0, numbers.length - pop);
+    const rest = (count: number, pop: number) =>
+    (toValidate(pop).reduce((sum, el, i) => sum + el * (count - i), 0) * 10) % 11 % 10;
+    return rest(10, 2) === validator[0] && rest(11, 1) === validator[1];
+}
+
 export function maskCPNJ(value: string): string {
   return value
     .replace(/\D/g, "") // Remove tudo que não é dígito
