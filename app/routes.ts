@@ -6,6 +6,7 @@ export default [
         route("login", "./routes/_open/login.tsx"),
         route("register", "./routes/_open/register.tsx"),
         route("adocao/:petId", "./routes/_open/adoption_profile.tsx"),
-        route("pesquisa", "./routes/_open/pet_search.tsx")
+        route("pesquisa", "./routes/_open/pet_search.tsx"),
+        route("faq", "./routes/_open/faq.tsx" )
     ]),
 ] satisfies RouteConfig;
