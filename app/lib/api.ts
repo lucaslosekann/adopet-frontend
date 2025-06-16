@@ -68,6 +68,7 @@ type Pet = {
         uf: string;
     };
 };
+
 export const getPet = async (petId: string) => {
     const response = await instance.get<Pet>(`/pets/${petId}`);
     return response.data;
@@ -105,3 +106,29 @@ export const adoptionRequest = async (data: FormData) => {
     const response = await instance.post(`/adoption`, data);
     return response.data;
 };
+export const getPets = async (limit: number) => {
+    const response = await instance.get<Omit<Pet, "address">[]>(`pets?limit=${limit}`);
+    return response.data;
+}
+
+export type RecommendedPet = {
+  id: string;
+  formerName: string;
+  dateOfBirth: string;
+  breed: {
+    name: string;
+    specieName: string;
+  };
+  weight: number;
+  size: string;
+  castrated: boolean;
+  available: boolean;
+  PetImage: {
+    id: string;
+  }[];
+};
+
+export const getRecommendedPets = async () =>{
+    const response = await instance.get<{recommendedPets: RecommendedPet[]}>(`/recommendation`);
+    return response.data.recommendedPets;
+}

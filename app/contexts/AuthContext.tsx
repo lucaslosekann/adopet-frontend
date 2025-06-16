@@ -3,7 +3,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { getMe, instance, loginRequest, registerONGRequest, registerAdoptantRequest } from '../lib/api';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 
 export type User = {
@@ -65,6 +65,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     useEffect(() => {
         const id = instance.interceptors.response.use(
@@ -96,8 +97,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const LoginMutation = useMutation({
-        mutationKey: ['login'],
-        mutationFn: ({ email, password, rememberMe }: { email: string; password: string; rememberMe: boolean }) => {
+        mutationKey: ['login', searchParams],
+        mutationFn: ({ email, password }: { email: string; password: string; rememberMe: boolean }) => {
             return loginRequest(email, password);
         },
         onSuccess: (data, variables) => {
@@ -106,7 +107,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             if (variables.rememberMe) {
                 localStorage.setItem('adopet-token', data.token);
             }
-            navigate('/');
+            const to = searchParams.get('to');
+            const state = searchParams.get('state');
+            if (to) {
+                navigate(to, {
+                    state: state ? JSON.parse(state) : undefined,
+                });
+            } else {
+                navigate('/');
+            }
         },
         onError: (error) => {
             if (axios.isAxiosError(error)) {
@@ -178,6 +187,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const logout = useCallback(async () => {
+        navigate('/login');
         setUser(null);
         localStorage.removeItem('adopet-token');
     }, []);

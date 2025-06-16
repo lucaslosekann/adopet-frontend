@@ -6,7 +6,7 @@ export default [
         route('documentos-adocao', './routes/_authenticated/adoption_documents.tsx'),
     ]),
     layout('./routes/_open/open-layout.tsx', [
-        index('./routes/_authenticated/_index.tsx'),
+        index('./routes/_open/_index.tsx'),
         route('login', './routes/_open/login.tsx'),
         route('ong/:id', './routes/_open/ngo_profile.tsx'),
         route('adocao/:petId', './routes/_open/adoption_profile.tsx'),
