@@ -1,12 +1,6 @@
-import React, { use, useCallback } from 'react';
-import { Input } from '../../components/ui/input';
-import { Button } from '../../components/ui/button';
-import { Link } from 'react-router';
 import Header from '~/components/Header';
 import { useAuthContext } from '~/contexts/AuthContext';
 import { getCpfFormatado, getDataFormatada } from '~/lib/utils';
-
-//{JSON.stringify(props.params.id)}
 
 export default function AdopterProfile() {
     const { user } = useAuthContext();
