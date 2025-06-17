@@ -22,7 +22,7 @@ type Props = {
     racas: string[];
     portes: string[];
     sexo: string[];
-    castrado: string[];
+    castrado: boolean[];
     ordenar: string | null;
   }) => void;
 };
@@ -32,7 +32,7 @@ const PetFilter = ({ onFiltrar }: Props) => {
   const [racas, setRacas] = useState<string[]>([]);
   const [portes, setPortes] = useState<string[]>([]);
   const [sexo, setSexo] = useState<string[]>([]);
-  const [castrado, setCastrado] = useState<string[]>([]);
+  const [castrado, setCastrado] = useState<boolean[]>([]);
   const [ordenar, setOrdenar] = useState<string | null>(null);
 
   const racasDisponiveis = especies.flatMap((e) => racaMap[e] || []);

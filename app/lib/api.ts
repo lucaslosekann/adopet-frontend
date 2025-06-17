@@ -52,6 +52,8 @@ type Pet = {
     formerName: string;
     dateOfBirth: string;
     weight: number;
+    size: string;
+    sex: "MALE" | "FEMALE";
     speciesName: string;
     breedName: string;
     castrated: boolean;
@@ -73,3 +75,8 @@ export const getPet = async (petId: string) => {
     const response = await instance.get<Pet>(`/pets/${petId}`);
     return response.data;
 };
+
+export const getPets = async () => {
+    const response = await instance.get<Omit<Pet, "address">[]>(`/pets`);
+    return response.data;
+}
