@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useEffect } from 'react';
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -8,13 +8,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
     const { loading, isAuthenticated, user } = useAuthContext();
     const navigate = useNavigate();
+    const { state } = useLocation();
 
     useEffect(() => {
         if (!isAuthenticated && !loading) {
-            console.log(loading, isAuthenticated, user);
-            navigate('/login');
+            // console.log(loading, isAuthenticated, user, window.location.href, state);
+            navigate(`/login?to=${window.location.pathname}&state=${JSON.stringify(state)}`);
         }
-    }, [isAuthenticated, loading]);
+    }, [isAuthenticated, loading, state]);
 
     if (loading || !isAuthenticated) {
         return (
