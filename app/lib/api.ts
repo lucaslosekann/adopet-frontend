@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { ManagedPet } from '~/components/tables/ManagePets';
 export const API_URL = 'http://localhost:8000/v1';
 export const instance = axios.create({
     baseURL: API_URL,
@@ -131,4 +132,9 @@ export type RecommendedPet = {
 export const getRecommendedPets = async () =>{
     const response = await instance.get<{recommendedPets: RecommendedPet[]}>(`/recommendation`);
     return response.data.recommendedPets;
+}
+
+
+export const getPetsOng = async () => {
+    return (await instance.get<ManagedPet[]>(`/ongs/manage/pets`)).data;
 }

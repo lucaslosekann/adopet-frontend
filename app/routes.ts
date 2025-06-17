@@ -12,4 +12,7 @@ export default [
         route('adocao/:petId', './routes/_open/adoption_profile.tsx'),
         route('register', './routes/_open/register.tsx'),
     ]),
+    layout('./routes/_ong/ong-layout.tsx', [
+        route('manage/pets', './routes/_ong/pets.tsx')
+    ])
 ] satisfies RouteConfig;
