@@ -118,11 +118,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 } else {
                     if (error.response?.data.message) {
                         toast(<ToastMessage title="Algo deu errado!" description={error.response?.data.message} />);
-                    } else if (error.response?.data.errors?.[0]?.message) {
+                    } else if (error.response?.data.error?.[0]?.message) {
                         toast(
                             <ToastMessage
                                 title="Algo deu errado!"
-                                description={error.response?.data.errors?.[0]?.message}
+                                description={error.response?.data.error?.[0]?.message}
                             />,
                         );
                     } else {
