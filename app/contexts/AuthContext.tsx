@@ -1,10 +1,12 @@
-'use client';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { getMe, instance, loginRequest, registerONGRequest, registerAdoptantRequest } from '../lib/api';
-import { useNavigate } from 'react-router';
-import { toast } from 'sonner';
+
+"use client";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { getMe, instance, loginRequest, registerONGRequest, registerAdoptantRequest } from "../lib/api";
+import { useNavigate, useSearchParams } from 'react-router';
+import { toast } from "sonner";
+import ToastMessage from "~/components/ToastMessage";
 
 export type User = {
     id: string;
@@ -25,6 +27,9 @@ export type User = {
     createdAt: string;
     updatedAt: string;
     taxId: string;
+    Ong?: {
+        id: string
+    }
 };
 
 type RegisterAdoptantData = {
@@ -49,7 +54,7 @@ type RegisterAdoptantData = {
 
 // Create the context
 export type AuthContextProps = {
-    login: (email: string, password: string) => void;
+    login: (email: string, password: string, rememberMe: boolean) => void;
     registerONG: (cnpj: string, pixKey: string, email: string, password: string) => void;
     registerAdoptant: (data: RegisterAdoptantData) => void;
     logout: () => void;
@@ -65,6 +70,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     useEffect(() => {
         const id = instance.interceptors.response.use(
@@ -80,8 +86,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         );
         (async () => {
             try {
-                const token = localStorage.getItem('adopet-token');
-                instance.defaults.headers['Authorization'] = token;
+                const token = localStorage.getItem("adopet-token");
+                instance.defaults.headers["Authorization"] = token;
                 const data = await getMe();
                 setUser(data);
             } catch {
@@ -96,26 +102,45 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const LoginMutation = useMutation({
-        mutationKey: ['login'],
-        mutationFn: ({ email, password }: { email: string; password: string }) => {
+        mutationKey: ['login', searchParams],
+        mutationFn: ({ email, password }: { email: string; password: string; rememberMe: boolean }) => {
             return loginRequest(email, password);
         },
-        onSuccess: (data) => {
+        onSuccess: (data, variables) => {
             setUser(data.user);
-            instance.defaults.headers['Authorization'] = data.token;
-            localStorage.setItem('adopet-token', data.token);
-            navigate('/');
+            instance.defaults.headers["Authorization"] = data.token;
+            if (variables.rememberMe) {
+                localStorage.setItem("adopet-token", data.token);
+            }
+            const to = searchParams.get('to');
+            const state = searchParams.get('state');
+            if (to) {
+                navigate(to, {
+                    state: state ? JSON.parse(state) : undefined,
+                });
+            } else {
+                navigate('/');
+            }
         },
         onError: (error) => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
-                    toast.error('Credenciais Inválidas', {
-                        description: 'Email ou senha incorretos',
+                    toast.error("Credenciais Inválidas", {
+                        description: "Email ou senha incorretos",
                     });
                 } else {
-                    toast.error('Algo deu errado', {
-                        description: 'Tente novamente mais tarde',
-                    });
+                    if (error.response?.data.message) {
+                        toast(<ToastMessage title="Algo deu errado!" description={error.response?.data.message} />);
+                    } else if (error.response?.data.error?.[0]?.message) {
+                        toast(
+                            <ToastMessage
+                                title="Algo deu errado!"
+                                description={error.response?.data.error?.[0]?.message}
+                            />,
+                        );
+                    } else {
+                        toast(<ToastMessage title="Algo deu errado!" description="Tente novamente mais tarde" />);
+                    }
                 }
             }
         },
@@ -125,17 +150,18 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         mutationFn: registerONGRequest,
         onSuccess: (data) => {
             setUser(data.user);
-            instance.defaults.headers['Authorization'] = data.token;
-            localStorage.setItem('adopet-token', data.token);
+            instance.defaults.headers["Authorization"] = data.token;
+            localStorage.setItem("adopet-token", data.token);
+            navigate("/");
         },
         onError: (error) => {
-            let message = 'Tente novamente mais tarde';
+            let message = "Tente novamente mais tarde";
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 400) {
                     message = error.response?.data?.message;
                 }
             }
-            toast.error('Algo deu errado', {
+            toast.error("Algo deu errado", {
                 description: message,
             });
         },
@@ -145,24 +171,25 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         mutationFn: registerAdoptantRequest,
         onSuccess: (data) => {
             setUser(data.user);
-            instance.defaults.headers['Authorization'] = data.token;
-            localStorage.setItem('adopet-token', data.token);
+            instance.defaults.headers["Authorization"] = data.token;
+            localStorage.setItem("adopet-token", data.token);
+            navigate("/");
         },
         onError: (error) => {
-            let message = 'Tente novamente mais tarde';
+            let message = "Tente novamente mais tarde";
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 400) {
                     message = error.response?.data?.message;
                 }
             }
-            toast.error('Algo deu errado', {
+            toast.error("Algo deu errado", {
                 description: message,
             });
         },
     });
 
-    const login = useCallback(async (email: string, password: string) => {
-        await LoginMutation.mutateAsync({ email, password });
+    const login = useCallback(async (email: string, password: string, rememberMe: boolean) => {
+        await LoginMutation.mutateAsync({ email, password, rememberMe });
     }, []);
 
     const registerONG = useCallback(async (cnpj: string, pixKey: string, email: string, password: string) => {
@@ -174,8 +201,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const logout = useCallback(async () => {
+        navigate('/login');
         setUser(null);
-        localStorage.removeItem('adopet-token');
+        localStorage.removeItem("adopet-token");
     }, []);
 
     return (
@@ -199,7 +227,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 const useAuthContext = (): AuthContextProps => {
     const context = useContext(AuthContext);
     if (!context) {
-        throw new Error('useAuthContext must be used within an AuthProvider');
+        throw new Error("useAuthContext must be used within an AuthProvider");
     }
     return context;
 };
