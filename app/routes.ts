@@ -4,6 +4,7 @@ export default [
     layout("./routes/_authenticated/authenticated-layout.tsx", [
         route("meuperfil", "./routes/_authenticated/adopter_profile.tsx"),
         route("analisedoc", "./routes/_authenticated/doc_analysis.tsx"),
+        route("adocao-aprovada", "./routes/_authenticated/approved_adoption.tsx"),
         route("documentos-adocao", "./routes/_authenticated/adoption_documents.tsx"),
     ]),
     layout("./routes/_open/open-layout.tsx", [
