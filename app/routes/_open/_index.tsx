@@ -1,23 +1,23 @@
-import Header from '~/components/Header';
-import { useAuthContext } from '~/contexts/AuthContext';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/ui/carousel';
-import { constructPetImageUrl, getPets, getRecommendedPets } from '~/lib/api';
-import { Button } from '~/components/ui/button';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router';
+import Header from "~/components/Header";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "~/components/ui/carousel";
+import { constructPetImageUrl, getPets, getRecommendedPets } from "~/lib/api";
+import { Button } from "~/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router";
 
 export default function Home() {
-    const { isAuthenticated } = useAuthContext();
+    const { isAuthenticated, user } = useAuthContext();
     const navigate = useNavigate();
 
     const RecommendedPetsQuery = useQuery({
-        queryKey: ['recommended-pets'],
+        queryKey: ["recommended-pets"],
         queryFn: getRecommendedPets,
-        enabled: isAuthenticated,
+        enabled: isAuthenticated && !user.Ong,
     });
 
     const RetrieveLimitedPets = useQuery({
-        queryKey: ['limited-pets'],
+        queryKey: ["limited-pets"],
         queryFn: () => getPets(10),
         enabled: !isAuthenticated,
     });
@@ -36,7 +36,7 @@ export default function Home() {
                         companheiro leal.
                     </h3>
                     <h3 className="text-lg font-medium mt-4 text-align">
-                        Navegue, conheça histórias e encontre aquele pet que vai transformar o seu dia a dia.{' '}
+                        Navegue, conheça histórias e encontre aquele pet que vai transformar o seu dia a dia.{" "}
                         <strong>
                             Adotar é um ato de amor, e estamos aqui para garantir que ele aconteça do jeito certo.
                         </strong>
@@ -52,7 +52,7 @@ export default function Home() {
                     <img src="/homeImage.png" alt="pets_image" />
                 </div>
             </div>
-            {isAuthenticated ? (
+            {isAuthenticated && !user.Ong ? (
                 <div className=" w-full max-w-7xl mx-auto my-6">
                     <h2 className="font-secondary text-5xl text-background-secondary text-center mb-10">
                         Pets recomendados para você!
@@ -73,7 +73,7 @@ export default function Home() {
                                                 onError={(e) => {
                                                     const target = e.currentTarget;
                                                     target.onerror = null;
-                                                    target.src = '/default-fallback-image.png'; //Não esta funcionando
+                                                    target.src = "/default-fallback-image.png"; //Não esta funcionando
                                                 }}
                                             />
                                             <h3 className="mt-4 text-xl font-bold">{pet.formerName}</h3>
@@ -106,7 +106,7 @@ export default function Home() {
                                                 alt={pet.formerName}
                                                 className="h-60 w-full object-cover rounded-lg"
                                                 onError={(e) => {
-                                                    (e.target as HTMLImageElement).src = '/default-fallback-image.png';
+                                                    (e.target as HTMLImageElement).src = "/default-fallback-image.png";
                                                 }}
                                             />
                                             <h3 className="mt-4 text-xl font-bold">{pet.formerName}</h3>

@@ -1,5 +1,9 @@
 import axios from 'axios';
+import type { ManageAdoptionsSubmission, ManageAdoptions } from '~/components/tables/ManageAdoption';
 import type { ManagedPet } from '~/components/tables/ManagePets';
+import { fileTypeFromBlob } from 'file-type';
+
+
 export const API_URL = 'http://localhost:8000/v1';
 export const instance = axios.create({
     baseURL: API_URL,
@@ -52,7 +56,7 @@ type Pet = {
     formerName: string;
     dateOfBirth: string;
     weight: number;
-    speciesName: string;
+    specieName: string;
     breedName: string;
     castrated: boolean;
     ongId: string;
@@ -68,6 +72,7 @@ type Pet = {
         city: string;
         uf: string;
     };
+    size: string;
 };
 
 export const getPet = async (petId: string) => {
@@ -137,4 +142,31 @@ export const getRecommendedPets = async () =>{
 
 export const getPetsOng = async () => {
     return (await instance.get<ManagedPet[]>(`/ongs/manage/pets`)).data;
+}
+
+export const getAdoptions = async () => {
+    return (await instance.get<ManageAdoptions[]>(`/adoption`)).data;
+}
+
+export const getAdoptionSubmisson = async (adoptionId: string) => {
+    const response = await instance.get<ManageAdoptionsSubmission>(`adoption/submission/${adoptionId}`)
+    return response.data;
+}
+
+
+export const downloadFile = async (path: string) => {
+    const res = await instance.get(path, { responseType: 'blob' })
+  
+    const mimeType = (await fileTypeFromBlob(res.data))?.mime || 'application/octet-stream';
+    const blob = new Blob([res.data], { type: mimeType });
+    const url = window.URL.createObjectURL(blob);
+    window.open(url);
+}
+
+export const updateAdoptionStatus = async (body: {
+    adoptionId: string,
+    approved: boolean
+}) => {
+    const response = await instance.put(`adoption/status/`, body);
+    return response.data;
 }

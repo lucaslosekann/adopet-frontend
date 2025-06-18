@@ -1,6 +1,5 @@
-import React from 'react';
-import { faBars, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,10 +7,10 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu';
-import { Button } from './ui/button';
-import { AuthProvider, useAuthContext } from '~/contexts/AuthContext';
-import { Link, useNavigate } from 'react-router';
+} from "~/components/ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { Link, useNavigate } from "react-router";
 
 export default function Header() {
     const navigate = useNavigate();
@@ -27,9 +26,9 @@ export default function Header() {
                         <Button
                             className="bg-white text-background-secondary h-8"
                             onClick={() => {
-                                console.log('saindo');
+                                console.log("saindo");
                                 logout();
-                                navigate('/login');
+                                navigate("/login");
                             }}
                         >
                             Sair
@@ -38,7 +37,7 @@ export default function Header() {
                         <Button
                             className="bg-white text-background-secondary h-8 "
                             onClick={() => {
-                                navigate('/login');
+                                navigate("/login");
                             }}
                         >
                             Entrar
@@ -46,15 +45,27 @@ export default function Header() {
                     )}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <FontAwesomeIcon icon={faBars} style={{ color: '#FFFFFF' }} size="lg" />
+                            <FontAwesomeIcon icon={faBars} style={{ color: "#FFFFFF" }} size="lg" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuLabel>{isAuthenticated ? user.name : 'Anônimo'}</DropdownMenuLabel>
+                        <DropdownMenuContent avoidCollisions={false} align="end" className="my-2.5">
+                            <DropdownMenuLabel>{isAuthenticated ? user.name : "Anônimo"}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => navigate('/pesquisa')}>Pesquisar</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate("/pesquisa")}>Pesquisar</DropdownMenuItem>
                             <DropdownMenuItem>Doar</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate('/faq')}>FAQ</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate('/meuperfil')}>Perfil</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate("/faq")}>FAQ</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate("/meuperfil")}>Perfil</DropdownMenuItem>
+                            {isAuthenticated && user.Ong ? (
+                                <div>
+                                    <DropdownMenuItem onClick={() => navigate("/manage/pets")}>
+                                        Gerenciar Pets
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => navigate("/manage/adoption")}>
+                                        Gerenciar Adoção
+                                    </DropdownMenuItem>
+                                </div>
+                            ) : (
+                                <></>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

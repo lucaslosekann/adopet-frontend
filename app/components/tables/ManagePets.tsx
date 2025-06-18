@@ -1,4 +1,3 @@
-"use client";
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "../DataTable";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -88,7 +87,7 @@ export const columns: ColumnDef<ManagedPet>[] = [
         accessorKey: "weight",
         header: "Peso",
         id: "Peso",
-        accessorFn: (row) => `${row.weight}g`,
+        accessorFn: (row) => `${row.weight} kg`,
     },
     {
         header: "Castrado",
