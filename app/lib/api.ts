@@ -13,15 +13,13 @@ export const loginRequest = async (email: string, password: string) => {
     return response.data;
 };
 
-export const registerONGRequest = async (data: { cnpj: string,
-    pixKey: string,
-    email: string,
-    password: string }) => {
+export const registerONGRequest = async (data: { cnpj: string; pixKey: string; email: string; password: string }) => {
     const response = await instance.post("/ongs/", data);
     return response.data;
 };
 
-export const registerAdoptantRequest = async (data: { email: string;
+export const registerAdoptantRequest = async (data: {
+    email: string;
     password: string;
     name: string;
     cpf: string;
@@ -37,7 +35,8 @@ export const registerAdoptantRequest = async (data: { email: string;
     size: string;
     expenseRange: string;
     isActive: boolean;
-    isGoodWithKids: boolean; }) => {
+    isGoodWithKids: boolean;
+}) => {
     const response = await instance.post("/auth/register", data);
     return response.data;
 };
@@ -54,7 +53,7 @@ type Pet = {
     weight: number;
     size: string;
     sex: "MALE" | "FEMALE";
-    speciesName: string;
+    specieName: string;
     breedName: string;
     castrated: boolean;
     ongId: string;
@@ -79,4 +78,15 @@ export const getPet = async (petId: string) => {
 export const getPets = async () => {
     const response = await instance.get<Omit<Pet, "address">[]>(`/pets`);
     return response.data;
-}
+};
+
+export type Species = {
+    name: string;
+    Breed: {
+        name: string;
+    }[];
+};
+export const getSpecies = async () => {
+    const response = await instance.get<Species[]>(`/pets/species`);
+    return response.data;
+};
