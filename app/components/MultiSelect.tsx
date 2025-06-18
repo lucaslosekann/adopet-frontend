@@ -95,14 +95,14 @@ export default function MultiSelect({
               <Checkbox
                 id={op.value}
                 checked={selected.includes(op.value)}
-                onCheckedChange={(c) => {
+                onCheckedChange={(c:any) => {
                   if (!c) {
                     handleUnselect(op.value);
                   } else {
                     onChange([...selected, op.value]);
                   }
                 }}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e:any) => e.stopPropagation()}
               />
               <label
                 htmlFor={op.value}

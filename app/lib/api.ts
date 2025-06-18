@@ -15,7 +15,7 @@ export const loginRequest = async (email: string, password: string) => {
 };
 
 export const registerONGRequest = async (data: { cnpj: string; pixKey: string; email: string; password: string }) => {
-    const response = await instance.post('/ongs/', data);
+    const response = await instance.post("/ongs/", data);
     return response.data;
 };
 
@@ -38,7 +38,7 @@ export const registerAdoptantRequest = async (data: {
     isActive: boolean;
     isGoodWithKids: boolean;
 }) => {
-    const response = await instance.post('/auth/register', data);
+    const response = await instance.post("/auth/register", data);
     return response.data;
 };
 
@@ -52,7 +52,9 @@ type Pet = {
     formerName: string;
     dateOfBirth: string;
     weight: number;
-    speciesName: string;
+    size: string;
+    sex: "MALE" | "FEMALE";
+    specieName: string;
     breedName: string;
     castrated: boolean;
     ongId: string;
@@ -72,6 +74,17 @@ type Pet = {
 
 export const getPet = async (petId: string) => {
     const response = await instance.get<Pet>(`/pets/${petId}`);
+    return response.data;
+};
+
+export type Species = {
+    name: string;
+    Breed: {
+        name: string;
+    }[];
+};
+export const getSpecies = async () => {
+    const response = await instance.get<Species[]>(`/pets/species`);
     return response.data;
 };
 
@@ -107,8 +120,10 @@ export const adoptionRequest = async (data: FormData) => {
     const response = await instance.post(`/adoption`, data);
     return response.data;
 };
-export const getPets = async (limit: number) => {
-    const response = await instance.get<Omit<Pet, "address">[]>(`pets?limit=${limit}`);
+export const getPets = async (limit?: number) => {
+    const response = await instance.get<Omit<Pet, "address">[]>(`pets`, {
+        ...(limit ? { params: { limit } } : {}),
+    });
     return response.data;
 }
 
