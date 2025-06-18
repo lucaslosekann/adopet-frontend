@@ -1,22 +1,22 @@
-import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router';
-import { constructPetImageUrl, getOng, getPet } from '../../lib/api';
-import Header from '../../components/Header';
-import { DateTime } from 'luxon';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../../components/ui/carousel';
-import { cn } from '../../lib/utils';
+import { useQuery } from "@tanstack/react-query";
+import { Link, useParams } from "react-router";
+import { constructPetImageUrl, getOng, getPet } from "../../lib/api";
+import Header from "../../components/Header";
+import { DateTime } from "luxon";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../../components/ui/carousel";
+import { cn } from "../../lib/utils";
 
 export default function adoption_profile() {
     const { petId } = useParams();
     const PetQuery = useQuery({
-        queryKey: ['pet', petId],
+        queryKey: ["pet", petId],
         queryFn: () => getPet(petId as string),
         enabled: !!petId,
     });
 
     const ongId = PetQuery.data?.ongId;
     const OngQuery = useQuery({
-        queryKey: ['ong', ongId],
+        queryKey: ["ong", ongId],
         queryFn: () => getOng(ongId as string),
         enabled: !!ongId,
     });
@@ -32,8 +32,8 @@ export default function adoption_profile() {
             <Header />
             <div
                 className={cn(
-                    'container mx-auto flex-1 flex flex-col mt-10 pb-8',
-                    !PetQuery.data.PetImage.length && 'h-full justify-center',
+                    "container mx-auto flex-1 flex flex-col mt-10 pb-8",
+                    !PetQuery.data.PetImage.length && "h-full justify-center",
                 )}
             >
                 <h1 className="font-secondary text-background-secondary text-6xl">{PetQuery.data.formerName}</h1>
@@ -43,7 +43,7 @@ export default function adoption_profile() {
                         <div className="">
                             <Carousel
                                 opts={{
-                                    align: 'center',
+                                    align: "center",
                                     loop: false,
                                 }}
                             >
@@ -86,7 +86,7 @@ export default function adoption_profile() {
                         <div>
                             <p>Espécie</p>
                             <p className="text-black font-medium">
-                                {PetQuery.data.speciesName ? PetQuery.data.speciesName : 'N/A'}
+                                {PetQuery.data.specieName ? PetQuery.data.specieName : "N/A"}
                             </p>
                         </div>
                         <div>
@@ -96,26 +96,39 @@ export default function adoption_profile() {
                         <div>
                             <p>Idade</p>
                             <p className="text-black font-medium">
-                                {' '}
+                                {" "}
                                 {Math.floor(
-                                    Math.abs(DateTime.fromISO(PetQuery.data.dateOfBirth).diffNow('years').years),
-                                )}{' '}
+                                    Math.abs(DateTime.fromISO(PetQuery.data.dateOfBirth).diffNow("years").years),
+                                )}{" "}
                                 anos
                             </p>
                         </div>
                         <div>
                             <p>Porte</p>
-                            <p className="text-black font-medium">N/A</p>
+                            <p className="text-black font-medium">
+                                {(() => {
+                                    switch (PetQuery.data.size) {
+                                        case "small":
+                                            return "Pequeno";
+                                        case "medium":
+                                            return "Médio";
+                                        case "large":
+                                            return "Grande";
+                                        default:
+                                            return PetQuery.data.size;
+                                    }
+                                })()}
+                            </p>
                         </div>
                         <div>
                             <p>Peso</p>
                             <p className="text-black font-medium">
-                                {PetQuery.data.weight ? PetQuery.data.weight + ' kg' : 'N/A'}
+                                {PetQuery.data.weight ? PetQuery.data.weight + " kg" : "N/A"}
                             </p>
                         </div>
                         <div>
                             <p>Castrado</p>
-                            <p className="text-black font-medium">{PetQuery.data.castrated ? 'Sim' : 'Não'}</p>
+                            <p className="text-black font-medium">{PetQuery.data.castrated ? "Sim" : "Não"}</p>
                         </div>
                         <div>
                             <p>Localidade</p>

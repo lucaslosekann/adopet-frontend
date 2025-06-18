@@ -15,6 +15,7 @@ export default [
         route("faq", "./routes/_open/faq.tsx" )
     ]),
     layout('./routes/_ong/ong-layout.tsx', [
-        route('manage/pets', './routes/_ong/pets.tsx')
+        route('manage/pets', './routes/_ong/pets.tsx'),
+        route('manage/adoption', './routes/_ong/adoption.tsx')
     ])
 ] satisfies RouteConfig;

@@ -1,10 +1,9 @@
-
 "use client";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { getMe, instance, loginRequest, registerONGRequest, registerAdoptantRequest } from "../lib/api";
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import ToastMessage from "~/components/ToastMessage";
 
@@ -28,8 +27,8 @@ export type User = {
     updatedAt: string;
     taxId: string;
     Ong?: {
-        id: string
-    }
+        id: string;
+    };
 };
 
 type RegisterAdoptantData = {
@@ -102,7 +101,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const LoginMutation = useMutation({
-        mutationKey: ['login', searchParams],
+        mutationKey: ["login", searchParams],
         mutationFn: ({ email, password }: { email: string; password: string; rememberMe: boolean }) => {
             return loginRequest(email, password);
         },
@@ -112,22 +111,20 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             if (variables.rememberMe) {
                 localStorage.setItem("adopet-token", data.token);
             }
-            const to = searchParams.get('to');
-            const state = searchParams.get('state');
+            const to = searchParams.get("to");
+            const state = searchParams.get("state");
             if (to) {
                 navigate(to, {
                     state: state ? JSON.parse(state) : undefined,
                 });
             } else {
-                navigate('/');
+                navigate("/");
             }
         },
         onError: (error) => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
-                    toast.error("Credenciais Inválidas", {
-                        description: "Email ou senha incorretos",
-                    });
+                    toast(<ToastMessage title="Credencials inválidas!" description="Email ou Senha incorretos!" />);
                 } else {
                     if (error.response?.data.message) {
                         toast(<ToastMessage title="Algo deu errado!" description={error.response?.data.message} />);
@@ -161,9 +158,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     message = error.response?.data?.message;
                 }
             }
-            toast.error("Algo deu errado", {
-                description: message,
-            });
+            toast(<ToastMessage title="Algo deu errado!" description={message} />);
         },
     });
 
@@ -182,9 +177,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     message = error.response?.data?.message;
                 }
             }
-            toast.error("Algo deu errado", {
-                description: message,
-            });
+            toast(<ToastMessage title="Algo deu errado!" description={message} />);
         },
     });
 
@@ -201,7 +194,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const logout = useCallback(async () => {
-        navigate('/login');
+        navigate("/login");
         setUser(null);
         localStorage.removeItem("adopet-token");
     }, []);

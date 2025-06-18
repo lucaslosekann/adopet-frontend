@@ -83,7 +83,7 @@ export default function StepUserInfo({ nextStep, prevStep }: { nextStep: () => v
                         toast(<ToastMessage title="CPF Inválido!" description="Certifique-se de usar um CPF válido" />);
                     } else {
                         const step2Data = {
-                            taxId: cpf,
+                            taxId: formattedCPF,
                             phoneNumber: phone.replace(/\D/g, ""),
                             address: {
                                 street: data.get("street"),
