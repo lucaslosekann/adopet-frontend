@@ -75,7 +75,7 @@ export default function adoption_profile() {
                         <div className="transform transition-transform duration-300 hover:scale-103">
                             <Link
                                 className="bg-background-secondary text-white font-secondary text-6xl px-8 py-8 cursor-pointer rounded-xl shadow-md hover:shadow-lg"
-                                to="/documentos-adocao"
+                                to="/documents-adoption"
                                 state={{ petId: PetQuery.data.id, petName: PetQuery.data.formerName }}
                             >
                                 ADOTAR {PetQuery.data.formerName}

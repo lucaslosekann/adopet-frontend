@@ -41,7 +41,7 @@ export default function Home() {
                             Adotar é um ato de amor, e estamos aqui para garantir que ele aconteça do jeito certo.
                         </strong>
                     </h3>
-                    <Link to="/pesquisa">
+                    <Link to="/search">
                         <Button className="text-lg bg-background-secondary my-5 w-30 hover:to-background-terciary">
                             Adotar
                         </Button>
@@ -64,7 +64,7 @@ export default function Home() {
                                     key={index}
                                     className="md:basis-1/2 lg:basis-1/5 px-2 flex justify-center"
                                 >
-                                    <Link to={`adocao/${pet.id}`}>
+                                    <Link to={`adoption/${pet.id}`}>
                                         <div className="bg-gray-25 shadow-md rounded-xl p-2 flex flex-col items-center">
                                             <img
                                                 src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}
@@ -99,7 +99,7 @@ export default function Home() {
                                     key={index}
                                     className="md:basis-1/2 lg:basis-1/5 px-2 flex justify-center transition-transform duration-300 hover:-translate-y-2"
                                 >
-                                    <Link to={`adocao/${pet.id}`}>
+                                    <Link to={`adoption/${pet.id}`}>
                                         <div className="bg-gray-25 shadow-md rounded-xl p-2 flex flex-col items-center">
                                             <img
                                                 src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}

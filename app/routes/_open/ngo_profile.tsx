@@ -86,7 +86,6 @@ export default function NgoProfile(props: {
                             className="w-40 h-40 rounded-2xl border-4 border-background-secondary"
                         />
                         <div className="space-y-1">
-                            <p className="font-secondary text-2xl">Perfil da ONG</p>
                             <h1 className="font-secondary text-5xl font-bold">{ong.name}</h1>
                             <p className="text-sm text-gray-500 pt-2">Criado em {getDataFormatada(ong.createdAt)}.</p>
                         </div>

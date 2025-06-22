@@ -1,16 +1,16 @@
-import React, { useCallback } from 'react';
-import Header from '../../components/Header';
-import { cn } from '../../lib/utils';
-import SendDocumentsProgress from '../../components/SendDocumentsProgress';
-import { Label } from '../../components/ui/label';
-import { Button } from '../../components/ui/button';
-import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Textarea } from '../../components/ui/textarea';
-import { toast } from 'sonner';
-import { useMutation } from '@tanstack/react-query';
-import { adoptionRequest } from '../../lib/api';
-import { useLocation, useNavigate } from 'react-router';
+import React, { useCallback } from "react";
+import Header from "../../components/Header";
+import { cn } from "../../lib/utils";
+import SendDocumentsProgress from "../../components/SendDocumentsProgress";
+import { Label } from "../../components/ui/label";
+import { Button } from "../../components/ui/button";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { Textarea } from "../../components/ui/textarea";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { adoptionRequest } from "../../lib/api";
+import { useLocation, useNavigate } from "react-router";
 
 export default function AdoptionDocuments() {
     const { state } = useLocation();
@@ -23,13 +23,13 @@ export default function AdoptionDocuments() {
     const SubmitAdoptionRequestMutation = useMutation({
         mutationFn: adoptionRequest,
         onSuccess: () => {
-            toast.success('Documentos enviados com sucesso! Aguarde a análise.');
+            toast.success("Documentos enviados com sucesso! Aguarde a análise.");
             setRgFile(null);
             setResidenceProofFile(null);
-            navigate('/analise');
+            navigate("/document-analysis");
         },
         onError: (error: any) => {
-            let message = 'Ocorreu um erro ao submeter sua solicitação de adoção. Por favor, tente novamente.';
+            let message = "Ocorreu um erro ao submeter sua solicitação de adoção. Por favor, tente novamente.";
             if (error.response?.data?.message) {
                 message = error.response.data.message;
             }
@@ -41,15 +41,15 @@ export default function AdoptionDocuments() {
         (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             if (!rgFile) {
-                return toast.error('Por favor, anexe o RG (frente e verso).');
+                return toast.error("Por favor, anexe o RG (frente e verso).");
             }
             if (!residenceProofFile) {
-                return toast.error('Por favor, anexe o comprovante de residência.');
+                return toast.error("Por favor, anexe o comprovante de residência.");
             }
             const formData = new FormData(event.currentTarget);
-            formData.append('idCard', rgFile);
-            formData.append('proofOfResidence', residenceProofFile);
-            formData.append('petId', state?.petId!);
+            formData.append("idCard", rgFile);
+            formData.append("proofOfResidence", residenceProofFile);
+            formData.append("petId", state?.petId!);
             SubmitAdoptionRequestMutation.mutate(formData);
         },
         [rgFile, residenceProofFile, state?.petId],
@@ -68,7 +68,7 @@ export default function AdoptionDocuments() {
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
-            <div className={cn('container mx-auto flex-1 flex flex-col mt-10 pb-8')}>
+            <div className={cn("container mx-auto flex-1 flex flex-col mt-10 pb-8")}>
                 <h1 className="font-secondary text-background-secondary text-6xl">ENVIO DE DOCUMENTOS</h1>
                 {/* {state.petName} */}
                 <h2 className="font-secondary text-background-secondary text-2xl">
@@ -87,7 +87,7 @@ export default function AdoptionDocuments() {
                                 <span>{rgFile.name}</span>
                                 <Button
                                     type="button"
-                                    variant={'link'}
+                                    variant={"link"}
                                     onClick={() => setRgFile(null)}
                                     className="text-xs cursor-pointer"
                                 >
@@ -97,7 +97,7 @@ export default function AdoptionDocuments() {
                         ) : (
                             <Button
                                 type="button"
-                                variant={'outline'}
+                                variant={"outline"}
                                 className="cursor-pointer mt-2"
                                 onClick={() => {
                                     rgFileInputRef.current?.click();
@@ -129,7 +129,7 @@ export default function AdoptionDocuments() {
                                 <span>{residenceProofFile.name}</span>
                                 <Button
                                     type="button"
-                                    variant={'link'}
+                                    variant={"link"}
                                     onClick={() => setResidenceProofFile(null)}
                                     className="text-xs cursor-pointer"
                                 >
@@ -139,7 +139,7 @@ export default function AdoptionDocuments() {
                         ) : (
                             <Button
                                 type="button"
-                                variant={'outline'}
+                                variant={"outline"}
                                 className="cursor-pointer mt-2"
                                 onClick={() => {
                                     residenceProofFileInputRef.current?.click();

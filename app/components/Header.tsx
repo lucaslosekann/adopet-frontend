@@ -50,10 +50,10 @@ export default function Header() {
                         <DropdownMenuContent avoidCollisions={false} align="end" className="my-2.5">
                             <DropdownMenuLabel>{isAuthenticated ? user.name : "Anônimo"}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => navigate("/pesquisa")}>Pesquisar</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate("/search")}>Pesquisar</DropdownMenuItem>
                             <DropdownMenuItem>Doar</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => navigate("/faq")}>FAQ</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate("/meuperfil")}>Perfil</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate("/profile")}>Perfil</DropdownMenuItem>
                             {isAuthenticated && user.Ong ? (
                                 <div>
                                     <DropdownMenuItem onClick={() => navigate("/manage/pets")}>
