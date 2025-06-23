@@ -17,14 +17,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useCallback, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -155,19 +148,6 @@ function FormRegisterPet() {
 
     const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
 
-    // formerName: z.string(),
-    // dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-
-    // species: z.string(),
-    // breed: z.string(),
-
-    // weight: z.number(),
-    // size: z.string(),
-    // castrated: z.boolean(),
-    // available: z.boolean(),
-    // expenseRange: z.string(),
-    // isActive: z.boolean(),
-    // isGoodWithKids: z.boolean(),
     return (
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
             <div>
@@ -302,6 +282,62 @@ function ActionsCellComponent({ row }: CellContext<ManagedPet, unknown>) {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Detalhes do pet</DialogTitle>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-md font-semibold">Gasto estimado mensal</p>
+                                <p>R${pet.expenseRange}</p>
+                            </div>
+                            <div>
+                                <p className="text-md font-semibold">É bom com crianças?</p>
+                                <p>{pet.isGoodWithKids ? "Sim" : "Não"}</p>
+                            </div>
+                            <div>
+                                <p className="text-md font-semibold">Tamanho</p>
+                                <p>
+                                    {(() => {
+                                        switch (pet.size) {
+                                            case "small":
+                                                return "Pequeno";
+                                            case "medium":
+                                                return "Médio";
+                                            case "large":
+                                                return "Grande";
+                                            default:
+                                                return "N/A";
+                                        }
+                                    })()}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-md font-semibold">É um pet fisicamente ativo?</p>
+                                <p>{pet.isActive ? "Sim" : "Não"}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-md font-semibold">Criado em</p>
+                                <p>
+                                    {new Date(pet.createdAt)
+                                        .toLocaleDateString("pt-BR", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            second: "2-digit",
+                                        })
+                                        .replace(",", "")}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-md font-semibold">Atualizado em</p>
+                                <p>
+                                    {new Date(pet.updatedAt)
+                                        .toLocaleDateString("pt-BR", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            second: "2-digit",
+                                        })
+                                        .replace(",", "")}
+                                </p>
+                            </div>
+                        </div>
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
