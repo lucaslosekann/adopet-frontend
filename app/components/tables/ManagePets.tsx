@@ -1,9 +1,9 @@
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "../DataTable";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { PencilIcon, TextSelectIcon, Trash2Icon } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PencilIcon, Plus, PlusIcon, TextSelectIcon, Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
-import { getPetsOng } from "~/lib/api";
+import { getPetsOng, getSpecies, registerPet } from "~/lib/api";
 import { DateTime } from "luxon";
 import {
     AlertDialog,
@@ -24,6 +24,9 @@ import { Input } from "../ui/input";
 import { DatePicker } from "../DatePicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import ToastMessage from "../ToastMessage";
+import { toast } from "sonner";
+import Combobox from "../Combobox";
 
 export type ManagedPet = {
     id: string;
@@ -105,6 +108,8 @@ export default function ManagedPetsTable() {
         queryFn: getPetsOng,
     });
 
+    const [registerPetFormOpen, setRegisterPetFormOpen] = useState(false);
+
     if (ManagedPetsQuery.isLoading) {
         return <div>Loading...</div>;
     }
@@ -122,9 +127,9 @@ export default function ManagedPetsTable() {
                 columns={columns}
                 data={ManagedPetsQuery.data}
                 leftComponent={
-                    <Dialog>
+                    <Dialog open={registerPetFormOpen} onOpenChange={setRegisterPetFormOpen}>
                         <DialogTrigger asChild>
-                            <Button className="aspect-square cursor-pointer" variant="outline">
+                            <Button className="cursor-pointer" variant="outline">
                                 Cadastrar Pet
                             </Button>
                         </DialogTrigger>
@@ -132,7 +137,7 @@ export default function ManagedPetsTable() {
                             <DialogHeader>
                                 <DialogTitle>Cadastro do pet</DialogTitle>
                             </DialogHeader>
-                            <FormRegisterPet />
+                            <FormRegisterPet onClose={() => setRegisterPetFormOpen(false)} />
                         </DialogContent>
                     </Dialog>
                 }
@@ -141,112 +146,259 @@ export default function ManagedPetsTable() {
     );
 }
 
-function FormRegisterPet() {
-    const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-    }, []);
+function FormRegisterPet({ onClose }: { onClose: () => void }) {
+    const queryClient = useQueryClient();
+    const SpeciesQuery = useQuery({
+        queryKey: ["speciesEdit"],
+        queryFn: getSpecies,
+    });
+
+    const RegisterPetMutation = useMutation({
+        mutationFn: registerPet,
+        onSuccess: () => {
+            toast("Pet cadastrado com sucesso");
+            SpeciesQuery.refetch();
+            queryClient.invalidateQueries({
+                exact: true,
+                queryKey: ["pets-ong"],
+            });
+            onClose();
+        },
+        onError: () => {
+            toast(<ToastMessage title="Algo deu errado!" />);
+        },
+    });
+
+    const [addedSpecies, setAddedSpecies] = useState<
+        {
+            name: string;
+            Breed: {
+                name: string;
+            }[];
+        }[]
+    >([]);
+    const [specie, setSpecie] = useState<string>();
+    const [breed, setBreed] = useState<string>();
+    const [speciesComboboxOpen, setSpeciesComboboxOpen] = useState(false);
+    const [breedComboboxOpen, setBreedComboboxOpen] = useState(false);
 
     const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
 
+    const handleSubmit = useCallback(
+        (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            if (!birthDate) {
+                toast(<ToastMessage title="Preencha a data de nascimento" />);
+                return;
+            }
+            if (!specie) {
+                toast(<ToastMessage title="Preencha a espécie" />);
+                return;
+            }
+            if (!breed) {
+                toast(<ToastMessage title="Preencha a raça" />);
+                return;
+            }
+            const data = new FormData(e.currentTarget);
+
+            RegisterPetMutation.mutate({
+                formerName: data.get("formerName") as string,
+                size: data.get("size") as string,
+                expenseRange: data.get("expenseRange") as string,
+                castrated: data.get("castrated") === "true",
+                available: data.get("available") === "true",
+                isActive: data.get("isActive") === "true",
+                isGoodWithKids: data.get("isGoodWithKids") === "true",
+                weight: Number(data.get("weight")),
+                dateOfBirth: birthDate.toISOString().split("T")[0],
+                species: specie,
+                breed,
+                sex: data.get("sex") as string,
+            });
+        },
+        [birthDate, specie, breed],
+    );
+
     return (
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-            <div>
-                <Label className="text-md">Nome do Pet</Label>
-                <Input type="text" name="formerName" placeholder="Ex: Tapioca" className="w-full mt-2" required />
-            </div>
-            <div>
-                <Label className="text-md mb-2">Data de Nascimento</Label>
-                <DatePicker date={birthDate} onChange={setBirthDate} />
-            </div>
-            <div>
-                <Label className="text-md">Peso</Label>
-                <Input
-                    type="number"
-                    name="weight"
-                    placeholder="Ex: 5000 (em gramas)"
-                    className="w-full mt-2"
-                    required
-                />
-            </div>
-            <div>
-                <Label className="text-md">Tamanho</Label>
-                <Select name="size" required>
-                    <SelectTrigger className="mt-2 w-full">
-                        <SelectValue placeholder="Selecione uma opção" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="small">Pequeno</SelectItem>
-                        <SelectItem value="medium">Médio</SelectItem>
-                        <SelectItem value="large">Grande</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div>
-                <Label className="text-md">É castrado?</Label>
-                <RadioGroup name="castrated" className="mt-2" required>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="castratedY" value="true" />
-                        <Label htmlFor="castratedY">Sim</Label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <Label className="text-md">Nome do Pet</Label>
+                    <Input type="text" name="formerName" placeholder="Ex: Tapioca" className="w-full mt-2" required />
+                </div>
+                <div>
+                    <Label className="text-md mb-2">Data de Nascimento</Label>
+                    <DatePicker date={birthDate} onChange={setBirthDate} />
+                </div>
+                <div>
+                    <Label className="text-md">Peso</Label>
+                    <Input
+                        type="number"
+                        step={0.01}
+                        name="weight"
+                        placeholder="Ex: 3 (em kilos)"
+                        className="w-full mt-2"
+                        required
+                    />
+                </div>
+                <div>
+                    <Label className="text-md">Tamanho</Label>
+                    <Select name="size" required>
+                        <SelectTrigger className="mt-2 w-full">
+                            <SelectValue placeholder="Selecione uma opção" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="small">Pequeno</SelectItem>
+                            <SelectItem value="medium">Médio</SelectItem>
+                            <SelectItem value="large">Grande</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div>
+                    <Label className="text-md">Sexo</Label>
+                    <Select name="sex" required>
+                        <SelectTrigger className="mt-2 w-full">
+                            <SelectValue placeholder="Selecione uma opção" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="MALE">Masculino</SelectItem>
+                            <SelectItem value="FEMALE">Feminino</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div>
+                    <Label className="text-md">É castrado?</Label>
+                    <RadioGroup name="castrated" className="mt-2" required>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="castratedY" value="true" />
+                            <Label htmlFor="castratedY">Sim</Label>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="castratedN" value="false" />
+                            <Label htmlFor="castratedN">Nao</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+                <div>
+                    <Label className="text-md">Disponível para adoção?</Label>
+                    <RadioGroup name="available" className="mt-2" required>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="availableY" value="true" />
+                            <Label htmlFor="availableY">Sim</Label>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="availableN" value="false" />
+                            <Label htmlFor="availableN">Nao</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+                <div>
+                    <Label className="text-md">Gasto estimado mensal</Label>
+                    <Select name="expenseRange" required>
+                        <SelectTrigger className="mt-2 w-full">
+                            <SelectValue placeholder="Selecione uma opção" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="250-499">R$250 - R$499</SelectItem>
+                            <SelectItem value="500-749">R$500 - R$749</SelectItem>
+                            <SelectItem value="750-999">R$750 - R$999</SelectItem>
+                            <SelectItem value="1000+">R$1000+</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div>
+                    <Label className="text-md">É um pet ativo?</Label>
+                    <RadioGroup name="isActive" className="mt-2" required>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="isActiveY" value="true" />
+                            <Label htmlFor="isActiveY">Sim</Label>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="isActiveN" value="false" />
+                            <Label htmlFor="isActiveN">Nao</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+                <div>
+                    <Label className="text-md">É bom com crianças?</Label>
+                    <RadioGroup name="isGoodWithKids" className="mt-2" required>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="isGoodWithKidsY" value="true" />
+                            <Label htmlFor="isGoodWithKidsY">Sim</Label>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <RadioGroupItem id="isGoodWithKidsN" value="false" />
+                            <Label htmlFor="isGoodWithKidsN">Nao</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+                <div>
+                    <Label className="text-md">Espécie</Label>
+                    <div className="flex justify-center items-center gap-2 mt-2">
+                        <Combobox
+                            items={[...(SpeciesQuery.data ?? []), ...addedSpecies]?.map((s) => ({
+                                value: s.name,
+                                label: s.name,
+                            }))}
+                            setValue={setSpecie}
+                            value={specie}
+                            open={speciesComboboxOpen}
+                            setOpen={setSpeciesComboboxOpen}
+                            placeholder="Selecione uma espécie"
+                            onAddButtonClicked={(v) => {
+                                setAddedSpecies((old) => [
+                                    ...old,
+                                    {
+                                        name: v,
+                                        Breed: [],
+                                    },
+                                ]);
+
+                                setSpecie(v);
+                            }}
+                        />
                     </div>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="castratedN" value="false" />
-                        <Label htmlFor="castratedN">Nao</Label>
+                </div>
+                <div>
+                    <Label className="text-md">Raça</Label>
+                    <div className="flex justify-center items-center gap-2 mt-2">
+                        {specie ? (
+                            <Combobox
+                                items={
+                                    [...(SpeciesQuery.data ?? []), ...addedSpecies]
+                                        ?.find((v) => v.name === specie)
+                                        ?.Breed.map((s) => ({ value: s.name, label: s.name })) ?? []
+                                }
+                                setValue={setBreed}
+                                value={breed}
+                                open={breedComboboxOpen}
+                                setOpen={setBreedComboboxOpen}
+                                placeholder="Selecione uma raça"
+                                onAddButtonClicked={(newValue) => {
+                                    setAddedSpecies((old) => {
+                                        return old.map((v: any) => {
+                                            if (v.name != specie) return v;
+                                            return {
+                                                name: specie,
+                                                Breed: [
+                                                    ...v.Breed,
+                                                    {
+                                                        name: newValue,
+                                                    },
+                                                ],
+                                            };
+                                        });
+                                    });
+                                    setBreed(newValue);
+                                }}
+                            />
+                        ) : (
+                            <span className="text-sm">Selecione a espécie primeiro</span>
+                        )}
                     </div>
-                </RadioGroup>
+                </div>
             </div>
-            <div>
-                <Label className="text-md">Disponível para adoção?</Label>
-                <RadioGroup name="available" className="mt-2" required>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="availableY" value="true" />
-                        <Label htmlFor="availableY">Sim</Label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="availableN" value="false" />
-                        <Label htmlFor="availableN">Nao</Label>
-                    </div>
-                </RadioGroup>
-            </div>
-            <div>
-                <Label className="text-md">Gasto estimado mensal</Label>
-                <Select name="expenseRange" required>
-                    <SelectTrigger className="mt-2 w-full">
-                        <SelectValue placeholder="Selecione uma opção" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="250-499">R$250 - R$499</SelectItem>
-                        <SelectItem value="500-749">R$500 - R$749</SelectItem>
-                        <SelectItem value="750-999">R$750 - R$999</SelectItem>
-                        <SelectItem value="1000+">R$1000+</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div>
-                <Label className="text-md">É um pet ativo?</Label>
-                <RadioGroup name="isActive" className="mt-2" required>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="isActiveY" value="true" />
-                        <Label htmlFor="isActiveY">Sim</Label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="isActiveN" value="false" />
-                        <Label htmlFor="isActiveN">Nao</Label>
-                    </div>
-                </RadioGroup>
-            </div>
-            <div>
-                <Label className="text-md">É bom com crianças?</Label>
-                <RadioGroup name="isGoodWithKids" className="mt-2" required>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="isGoodWithKidsY" value="true" />
-                        <Label htmlFor="isGoodWithKidsY">Sim</Label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <RadioGroupItem id="isGoodWithKidsN" value="false" />
-                        <Label htmlFor="isGoodWithKidsN">Nao</Label>
-                    </div>
-                </RadioGroup>
-            </div>
+            <Button>Cadastrar</Button>
         </form>
     );
 }

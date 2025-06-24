@@ -80,6 +80,24 @@ export const getPet = async (petId: string) => {
     return response.data;
 };
 
+export const registerPet = async (data: {
+    formerName: string;
+    dateOfBirth: string;
+    species: string;
+    breed: string;
+    weight: number;
+    size: string;
+    castrated: boolean;
+    available: boolean;
+    expenseRange: string;
+    isActive: boolean;
+    isGoodWithKids: boolean;
+    sex: string;
+}) => {
+    const response = await instance.post(`/pets`, data);
+    return response.data;
+};
+
 export type Species = {
     name: string;
     Breed: {
