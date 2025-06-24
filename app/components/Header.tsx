@@ -51,12 +51,25 @@ export default function Header() {
                             <DropdownMenuLabel>{isAuthenticated ? user.name : "Anônimo"}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => navigate("/search")}>Pesquisar</DropdownMenuItem>
-                            <DropdownMenuItem>Doar</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => navigate("/faq")}>FAQ</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate("/profile")}>Perfil</DropdownMenuItem>
+                            {isAuthenticated ? (
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        isAuthenticated && !user.Ong
+                                            ? navigate("/profile")
+                                            : navigate(`/ong/${user.Ong?.id}`);
+                                    }}
+                                >
+                                    Perfil
+                                </DropdownMenuItem>
+                            ) : (
+                                <></>
+                            )}
+
                             {isAuthenticated && user.Ong ? (
                                 <div>
                                     <DropdownMenuItem onClick={() => navigate("/manage/pets")}>
+                                        {" "}
                                         Gerenciar Pets
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => navigate("/manage/adoption")}>
