@@ -3,7 +3,7 @@ import type { ManageAdoptionsSubmission, ManageAdoptions } from "~/components/ta
 import type { ManagedPet } from "~/components/tables/ManagePets";
 import { fileTypeFromBlob } from "file-type";
 
-export const API_URL = "http://localhost:8000/v1";
+export const API_URL = import.meta.env.VITE_ADOPET_API_URL;
 export const instance = axios.create({
     baseURL: API_URL,
 });
