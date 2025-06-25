@@ -1,9 +1,18 @@
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "../DataTable";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PencilIcon, Plus, PlusIcon, TextSelectIcon, Trash2Icon } from "lucide-react";
+import { ImagePlusIcon, PencilIcon, Plus, PlusIcon, TextSelectIcon, Trash2Icon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
-import { deletePet, editPet, getPetsOng, getSpecies, registerPet } from "~/lib/api";
+import {
+    addPetImage,
+    constructPetImageUrl,
+    deletePet,
+    editPet,
+    getPetsOng,
+    getSpecies,
+    registerPet,
+    removePetImage,
+} from "~/lib/api";
 import { DateTime } from "luxon";
 import {
     AlertDialog,
@@ -17,8 +26,8 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useCallback, useState } from "react";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useCallback, useRef, useState, type ChangeEvent } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { DatePicker } from "../DatePicker";
@@ -595,6 +604,117 @@ function ActionsCellComponent({ row }: CellContext<ManagedPet, unknown>) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <ManagePetImagesComponent pet={pet} />
+        </div>
+    );
+}
+
+function ManagePetImagesComponent({ pet }: { pet: ManagedPet }) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const queryClient = useQueryClient();
+
+    const AddImageMutation = useMutation({
+        mutationFn: addPetImage,
+        onSuccess: () => {
+            toast("Imagem adicionada com sucesso");
+            queryClient.invalidateQueries({
+                exact: true,
+                queryKey: ["pets-ong"],
+            });
+        },
+        onError: () => {
+            toast(<ToastMessage title="Algo deu errado!" />);
+        },
+    });
+
+    const RemoveImageMutation = useMutation({
+        mutationFn: removePetImage,
+        onSuccess: () => {
+            toast("Imagem removida com sucesso");
+            queryClient.invalidateQueries({
+                exact: true,
+                queryKey: ["pets-ong"],
+            });
+        },
+        onError: () => {
+            toast(<ToastMessage title="Algo deu errado!" />);
+        },
+    });
+
+    const addNewImage = (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            const formData = new FormData();
+            formData.append("img", file);
+            AddImageMutation.mutate({
+                data: formData,
+                id: pet.id,
+            });
+        }
+    };
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button className="aspect-square cursor-pointer" variant="outline" size="icon">
+                    <ImagePlusIcon />
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Gerenciar as imagens</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                    {pet.PetImage.length ? (
+                        <div className="grid grid-cols-4 gap-4">
+                            {pet.PetImage.map((image) => (
+                                <ImageToImagesComponent
+                                    key={image.id}
+                                    url={constructPetImageUrl(pet.id, image.id)}
+                                    onRemove={() => {
+                                        RemoveImageMutation.mutate({
+                                            id: pet.id,
+                                            imageId: image.id,
+                                        });
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <span>
+                            Nenhuma imagem aqui ainda, adicione imagens do pet para ajudar os usuários em sua escolha
+                        </span>
+                    )}
+                    <div className="flex justify-between">
+                        <input
+                            type="file"
+                            name="image"
+                            accept="image/*"
+                            className="hidden"
+                            ref={fileInputRef}
+                            onChange={addNewImage}
+                        />
+
+                        <Button onClick={() => fileInputRef.current?.click()} className="cursor-pointer">
+                            Adicionar imagem
+                        </Button>
+                        <DialogClose asChild>
+                            <Button>Fechar</Button>
+                        </DialogClose>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function ImageToImagesComponent({ url, onRemove }: { url: string; onRemove: () => void }) {
+    return (
+        <div className="w-full aspect-square rounded-sm relative">
+            <img src={url} className="w-full aspect-square rounded-sm" />
+            <button onClick={onRemove}>
+                <XIcon className="text-red-700 top-2 right-2 absolute cursor-pointer" />
+            </button>
         </div>
     );
 }

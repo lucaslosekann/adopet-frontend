@@ -104,6 +104,16 @@ export const editPet = async ({ id, ...data }: CreatePetPayload & { id: string }
     return response.data;
 };
 
+export const addPetImage = async ({ id, data }: { id: string; data: FormData }) => {
+    const response = await instance.put(`/pets/${id}/image`, data);
+    return response.data;
+};
+
+export const removePetImage = async ({ id, imageId }: { id: string; imageId: string }) => {
+    const response = await instance.delete(`/pets/${id}/image/${imageId}`);
+    return response.data;
+};
+
 export const deletePet = async ({ id }: { id: string }) => {
     const response = await instance.delete(`/pets/${id}`);
     return response.data;
