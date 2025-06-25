@@ -179,7 +179,7 @@ function ActionsCellComponent({ row }: { row: ManageAdoptions }) {
                             Comprovante de residência
                         </Button>
                     </div>
-                    <div className="text-background-secondary font-medium space-y-3">
+                    <div className="text-black font-medium space-y-3">
                         <div>
                             <p>Pergunta 1: Você já teve animais de estimação antes?</p>
                             <p className="text-black font-semibold">
