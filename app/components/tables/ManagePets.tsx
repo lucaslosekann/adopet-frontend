@@ -3,7 +3,7 @@ import { DataTable } from "../DataTable";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Plus, PlusIcon, TextSelectIcon, Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
-import { editPet, getPetsOng, getSpecies, registerPet } from "~/lib/api";
+import { deletePet, editPet, getPetsOng, getSpecies, registerPet } from "~/lib/api";
 import { DateTime } from "luxon";
 import {
     AlertDialog,
@@ -465,10 +465,21 @@ function FormRegisterPet({ onClose, pet }: { onClose: () => void; pet?: ManagedP
 
 function ActionsCellComponent({ row }: CellContext<ManagedPet, unknown>) {
     const pet = row.original;
+    const queryClient = useQueryClient();
+
     const [editPetFormOpen, setEditPetFormOpen] = useState(false);
+
     const DeletePetMutation = useMutation({
-        mutationFn: async (petId: string) => {
-            alert(`Deleting pet with ID: ${petId}`);
+        mutationFn: deletePet,
+        onSuccess: () => {
+            toast("Pet marcado como indisponível");
+            queryClient.invalidateQueries({
+                exact: true,
+                queryKey: ["pets-ong"],
+            });
+        },
+        onError: () => {
+            toast(<ToastMessage title="Algo deu errado!" />);
         },
     });
 
@@ -565,16 +576,18 @@ function ActionsCellComponent({ row }: CellContext<ManagedPet, unknown>) {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Você tem certeza que deseja deletar este pet?</AlertDialogTitle>
+                        <AlertDialogTitle>
+                            Você tem certeza que deseja marcar este pet como indisponível?
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Esta ação não pode ser desfeita. Isso irá deletar esse pert permanentemente.
+                            Isso irá fazer com que ele não seja mais visível nas buscas e que ninguém possa adotá-lo.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => {
-                                DeletePetMutation.mutate(pet.id);
+                                DeletePetMutation.mutate({ id: pet.id });
                             }}
                         >
                             Sim, tenho certeza

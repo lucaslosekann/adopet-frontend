@@ -104,6 +104,11 @@ export const editPet = async ({ id, ...data }: CreatePetPayload & { id: string }
     return response.data;
 };
 
+export const deletePet = async ({ id }: { id: string }) => {
+    const response = await instance.delete(`/pets/${id}`);
+    return response.data;
+};
+
 export type Species = {
     name: string;
     Breed: {
