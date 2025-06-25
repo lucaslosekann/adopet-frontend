@@ -1,42 +1,75 @@
-import Header from '~/components/Header';
-import { useAuthContext } from '~/contexts/AuthContext';
-import { getCpfFormatado, getDataFormatada } from '~/lib/utils';
+import Header from "~/components/Header";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { getCpfFormatado, getDataFormatada, getPhoneFormatted } from "~/lib/utils";
 
 export default function AdopterProfile() {
     const { user } = useAuthContext();
     return (
-        <div className="bg-white w-screen h-screen flex flex-col">
+        <div className="bg-white min-h-screen flex flex-col">
             <Header />
-            <div className="flex flex-col justify-center items-center text-center mt-7">
-                <h1 className="font-secondary text-background-secondary text-2xl">Meu Perfil</h1>
-                <img
-                    src="/ngo_profile_icon.png"
-                    alt="ngo_profile_icon"
-                    className="w-40 rounded-2xl border-5 border-background-secondary mt-2"
-                />
-                <h1 className="font-secondary text-background-secondary text-5xl font-bold mt-3">{user.name}</h1>
-                <h1 className="text-background-secondary font-secondary text-2xl mt-1">
-                    {getCpfFormatado(user.taxId)}
-                </h1>
-                <h1 className="text-background-secondary font-bold mt-3">{user.phoneNumber}</h1>
-                <h1 className="text-background-secondary font-bold">{user.email}</h1>
-                <h1 className="text-background-secondary font-semibold">
-                    Entrou em {getDataFormatada(user.createdAt)}.
-                </h1>
-                <h1 className="text-background-secondary font-semibold">
-                    Última atualização em {getDataFormatada(user.updatedAt)}.
-                </h1>
-                <h1 className="font-secondary text-background-secondary text-2xl mt-5">Meu Endereço</h1>
-                <p className="text-background-secondary mt-1 font-semibold max-w-2xl">
-                    {user.address.neighborhood} - {user.address.city}, {user.address.uf}
-                </p>
-                <p className="text-background-secondary font-semibold max-w-2xl">
-                    CEP {user.address.postalCode} - {user.address.street}, {user.address.number}
-                </p>
-                <p className="text-background-secondary font-normal max-w-2xl">
-                    Atualizado em {getDataFormatada(user.address.updatedAt)}.
-                </p>
-            </div>
+            <main className="container mx-auto px-4 md:py-16 text-background-secondary">
+                <div className="max-w-4xl mx-auto space-y-12">
+                    <section className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+                        <img
+                            src="/profilePic_default.jpg"
+                            alt="Foto de perfil" // mudar aqui
+                            className="w-40 h-40 rounded-2xl border-4 border-background-secondary"
+                        />
+                        <div className="space-y-1">
+                            <h1 className="font-secondary text-5xl font-bold">{user.name}</h1>
+                            <p className="text-sm text-gray-500 pt-2">
+                                Criado em {new Date(user.createdAt).toLocaleDateString("pt-BR").replace(",", "")}.
+                            </p>
+                        </div>
+                    </section>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+                        <section>
+                            <h2 className="text-3xl font-bold font-secondary border-b-2 border-gray-200 pb-2 mb-4">
+                                Meus Dados
+                            </h2>
+                            <div className="space-y-2 text-lg">
+                                <div>
+                                    <p>Email</p>
+                                    <p className="font-semibold">{user.email}</p>
+                                </div>
+                                <div>
+                                    <p>Telefone</p>
+                                    <p className="font-semibold">{getPhoneFormatted(user.phoneNumber)}</p>
+                                </div>
+                                <div>
+                                    <p>CPF</p>
+                                    <p className="font-semibold">{getCpfFormatado(user.taxId)}</p>
+                                </div>
+                                <p className="text-sm text-gray-500 pt-4">
+                                    Última atualização:{" "}
+                                    {new Date(user.updatedAt)
+                                        .toLocaleDateString("pt-BR", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            second: "2-digit",
+                                        })
+                                        .replace(",", "")}
+                                    .
+                                </p>
+                            </div>
+                        </section>
+                        <section>
+                            <h2 className="text-3xl font-bold font-secondary border-b-2 border-gray-200 pb-2 mb-4">
+                                Meu Endereço
+                            </h2>
+                            <div className="space-y-1 text-lg">
+                                <p className="font-normal">
+                                    {user.address.street}, {user.address.number}
+                                </p>
+                                <p className="">
+                                    {user.address.city}, {user.address.uf} - {user.address.neighborhood}
+                                </p>
+                                <p className="font-normal">CEP: {user.address.postalCode}</p>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

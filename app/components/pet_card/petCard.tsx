@@ -1,5 +1,4 @@
 import { PawPrintIcon } from "lucide-react";
-import React from "react";
 import { Link } from "react-router-dom";
 import { constructPetImageUrl } from "~/lib/api";
 
@@ -13,7 +12,7 @@ const PetCard = ({ nome, imagem, id }: PetCardProps) => {
     return (
         <Link
             to={`/adoption/${id}`} // ou algum ID
-            className="flex flex-col items-center rounded-2xl overflow-hidden shadow-lg bg-white w-44 hover:shadow-xl transition"
+            className="flex flex-col items-center rounded-2xl overflow-hidden shadow-lg bg-white w-44 hover:shadow-xl transition-transform duration-300 hover:-translate-y-2"
         >
             {imagem ? (
                 <img src={constructPetImageUrl(id, imagem)} alt={nome} className="w-44 h-44 object-cover" />

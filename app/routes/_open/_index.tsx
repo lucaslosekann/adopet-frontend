@@ -5,6 +5,7 @@ import { constructPetImageUrl, getPets, getRecommendedPets } from "~/lib/api";
 import { Button } from "~/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router";
+import { PawPrintIcon } from "lucide-react";
 
 export default function Home() {
     const { isAuthenticated, user } = useAuthContext();
@@ -66,16 +67,15 @@ export default function Home() {
                                 >
                                     <Link to={`adoption/${pet.id}`}>
                                         <div className="bg-gray-25 shadow-md rounded-xl p-2 flex flex-col items-center">
-                                            <img
-                                                src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}
-                                                alt={pet.formerName}
-                                                className="h-60 w-full object-cover rounded-lg"
-                                                onError={(e) => {
-                                                    const target = e.currentTarget;
-                                                    target.onerror = null;
-                                                    target.src = "/default-fallback-image.png"; //Não esta funcionando
-                                                }}
-                                            />
+                                            {pet.PetImage.length ? (
+                                                <img
+                                                    src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}
+                                                    alt={pet.formerName}
+                                                    className="h-60 w-full object-cover rounded-lg"
+                                                />
+                                            ) : (
+                                                <PawPrintIcon className="w-44 h-44 text-gray-300" /> // NAO ESTA FUNCIONADO (NAO SEI PQ???)
+                                            )}
                                             <h3 className="mt-4 text-xl font-bold">{pet.formerName}</h3>
                                             <p className="text-gray-600">{pet.breed.name}</p>
                                         </div>
@@ -101,14 +101,15 @@ export default function Home() {
                                 >
                                     <Link to={`adoption/${pet.id}`}>
                                         <div className="bg-gray-25 shadow-md rounded-xl p-2 flex flex-col items-center">
-                                            <img
-                                                src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}
-                                                alt={pet.formerName}
-                                                className="h-60 w-full object-cover rounded-lg"
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).src = "/default-fallback-image.png";
-                                                }}
-                                            />
+                                            {pet.PetImage.length ? (
+                                                <img
+                                                    src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}
+                                                    alt={pet.formerName}
+                                                    className="h-60 w-full object-cover rounded-lg"
+                                                />
+                                            ) : (
+                                                <PawPrintIcon className="w-full h-60 object-cover rounded-lg text-gray-300" /> // NAO FUNCIONA
+                                            )}
                                             <h3 className="mt-4 text-xl font-bold">{pet.formerName}</h3>
                                             <p className="text-gray-600">{pet.breedName}</p>
                                         </div>

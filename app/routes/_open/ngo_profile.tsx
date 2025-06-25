@@ -8,7 +8,7 @@ import { getOng } from "~/lib/api";
 import Spinner from "~/components/Spinner";
 import { DateTime } from "luxon";
 import type { AxiosError } from "axios";
-import { getDataFormatada } from "~/lib/utils";
+import { getCpnjFormatted, getDataFormatada, getPhoneFormatted } from "~/lib/utils";
 import { createStaticPix, hasError } from "pix-utils";
 
 //{JSON.stringify(props.params.id)}
@@ -94,7 +94,7 @@ export default function NgoProfile(props: {
                         <h2 className="text-3xl font-bold font-secondary border-b-2 border-gray-200 pb-2 mb-4">
                             Sobre a ONG
                         </h2>
-                        <p className="font-semibold text-lg">{ong.about ?? "Nenhuma descrição informada."}</p>
+                        <p className="font-medium text-lg">{ong.about ?? "Nenhuma descrição informada."}</p>
                     </section>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
                         <section>
@@ -102,11 +102,28 @@ export default function NgoProfile(props: {
                                 Dados
                             </h2>
                             <div className="space-y-2 text-lg">
-                                <p className="font-semibold">{ong.phone}</p>
-                                <p className="font-semibold">{ong.email}</p>
-                                <p className="font-semibold">CNPJ {ong.cnpj}</p>
+                                <div>
+                                    Email
+                                    <p className="font-semibold">{ong.email}</p>
+                                </div>
+                                <div>
+                                    <p>Telefone</p>
+                                    <p className="font-semibold">{ong.phone}</p>
+                                </div>
+                                <div>
+                                    <p>CNPJ</p>
+                                    <p className="font-semibold">{getCpnjFormatted(ong.cnpj)}</p>
+                                </div>
                                 <p className="text-sm text-gray-500 pt-4">
-                                    Última atualização: {getDataFormatada(ong.updatedAt)}.
+                                    Última atualização:{" "}
+                                    {new Date(ong.updatedAt)
+                                        .toLocaleDateString("pt-BR", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            second: "2-digit",
+                                        })
+                                        .replace(",", "")}
+                                    .
                                 </p>
                             </div>
                         </section>
@@ -115,11 +132,11 @@ export default function NgoProfile(props: {
                                 Nos visite!
                             </h2>
                             <div className="space-y-1 text-lg">
-                                <p className="font-semibold">
-                                    {ong.address.city}, {ong.address.uf} - {ong.address.neighborhood}
-                                </p>
                                 <p className="font-normal">
                                     {ong.address.street}, {ong.address.number}
+                                </p>
+                                <p className="">
+                                    {ong.address.city}, {ong.address.uf} - {ong.address.neighborhood}
                                 </p>
                                 <p className="font-normal">CEP: {ong.address.postalCode}</p>
                             </div>
