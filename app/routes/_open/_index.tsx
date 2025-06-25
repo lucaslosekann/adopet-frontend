@@ -67,7 +67,7 @@ export default function Home() {
                                 >
                                     <Link to={`adoption/${pet.id}`}>
                                         <div className="bg-gray-25 shadow-md rounded-xl p-2 flex flex-col items-center">
-                                            {pet.PetImage ? (
+                                            {pet.PetImage.length ? (
                                                 <img
                                                     src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}
                                                     alt={pet.formerName}
@@ -101,7 +101,7 @@ export default function Home() {
                                 >
                                     <Link to={`adoption/${pet.id}`}>
                                         <div className="bg-gray-25 shadow-md rounded-xl p-2 flex flex-col items-center">
-                                            {pet.PetImage ? (
+                                            {pet.PetImage.length ? (
                                                 <img
                                                     src={constructPetImageUrl(pet.id, pet.PetImage[0]?.id)}
                                                     alt={pet.formerName}
