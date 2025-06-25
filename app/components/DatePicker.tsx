@@ -17,7 +17,7 @@ type DatePickerProps = {
 };
 
 export function DatePicker({ date, onChange }: DatePickerProps) {
-    const [dateString, setDateString] = useState("");
+    const [dateString, setDateString] = useState(date ? format(date, "dd/MM/yyyy") : "");
     return (
         <Popover modal={true}>
             <div className="relative w-full">

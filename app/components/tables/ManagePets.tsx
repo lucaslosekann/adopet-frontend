@@ -3,7 +3,7 @@ import { DataTable } from "../DataTable";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Plus, PlusIcon, TextSelectIcon, Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
-import { getPetsOng, getSpecies, registerPet } from "~/lib/api";
+import { editPet, getPetsOng, getSpecies, registerPet } from "~/lib/api";
 import { DateTime } from "luxon";
 import {
     AlertDialog,
@@ -41,6 +41,7 @@ export type ManagedPet = {
     isGoodWithKids: boolean;
     ongId: string;
     available: boolean;
+    sex: string;
     createdAt: string;
     updatedAt: string;
     PetImage: {
@@ -63,6 +64,12 @@ export const columns: ColumnDef<ManagedPet>[] = [
         accessorKey: "formerName",
         header: "Nome",
         id: "Nome",
+    },
+    {
+        accessorKey: "sex",
+        header: "Sexo",
+        id: "Sexo",
+        accessorFn: (r) => (r.sex === "MALE" ? "Macho" : "Fêmea"),
     },
     {
         accessorKey: "breed.specieName",
@@ -146,7 +153,7 @@ export default function ManagedPetsTable() {
     );
 }
 
-function FormRegisterPet({ onClose }: { onClose: () => void }) {
+function FormRegisterPet({ onClose, pet }: { onClose: () => void; pet?: ManagedPet }) {
     const queryClient = useQueryClient();
     const SpeciesQuery = useQuery({
         queryKey: ["speciesEdit"],
@@ -169,6 +176,22 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
         },
     });
 
+    const EditPetMutation = useMutation({
+        mutationFn: editPet,
+        onSuccess: () => {
+            toast("Pet editado com sucesso");
+            SpeciesQuery.refetch();
+            queryClient.invalidateQueries({
+                exact: true,
+                queryKey: ["pets-ong"],
+            });
+            onClose();
+        },
+        onError: () => {
+            toast(<ToastMessage title="Algo deu errado!" />);
+        },
+    });
+
     const [addedSpecies, setAddedSpecies] = useState<
         {
             name: string;
@@ -177,12 +200,14 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
             }[];
         }[]
     >([]);
-    const [specie, setSpecie] = useState<string>();
-    const [breed, setBreed] = useState<string>();
+    const [specie, setSpecie] = useState<string | undefined>(pet?.breed.specieName);
+    const [breed, setBreed] = useState<string | undefined>(pet?.breedName);
     const [speciesComboboxOpen, setSpeciesComboboxOpen] = useState(false);
     const [breedComboboxOpen, setBreedComboboxOpen] = useState(false);
 
-    const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
+    const [birthDate, setBirthDate] = useState<Date | undefined>(
+        pet?.dateOfBirth ? new Date(pet?.dateOfBirth) : undefined,
+    );
 
     const handleSubmit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
@@ -200,8 +225,7 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 return;
             }
             const data = new FormData(e.currentTarget);
-
-            RegisterPetMutation.mutate({
+            const payload = {
                 formerName: data.get("formerName") as string,
                 size: data.get("size") as string,
                 expenseRange: data.get("expenseRange") as string,
@@ -214,9 +238,15 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 species: specie,
                 breed,
                 sex: data.get("sex") as string,
-            });
+            };
+
+            if (pet) {
+                EditPetMutation.mutate({ ...payload, id: pet.id });
+            } else {
+                RegisterPetMutation.mutate(payload);
+            }
         },
-        [birthDate, specie, breed],
+        [birthDate, specie, breed, pet],
     );
 
     return (
@@ -224,7 +254,14 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <Label className="text-md">Nome do Pet</Label>
-                    <Input type="text" name="formerName" placeholder="Ex: Tapioca" className="w-full mt-2" required />
+                    <Input
+                        type="text"
+                        name="formerName"
+                        placeholder="Ex: Tapioca"
+                        className="w-full mt-2"
+                        required
+                        defaultValue={pet?.formerName}
+                    />
                 </div>
                 <div>
                     <Label className="text-md mb-2">Data de Nascimento</Label>
@@ -239,11 +276,12 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                         placeholder="Ex: 3 (em kilos)"
                         className="w-full mt-2"
                         required
+                        defaultValue={pet?.weight}
                     />
                 </div>
                 <div>
                     <Label className="text-md">Tamanho</Label>
-                    <Select name="size" required>
+                    <Select name="size" required defaultValue={pet?.size}>
                         <SelectTrigger className="mt-2 w-full">
                             <SelectValue placeholder="Selecione uma opção" />
                         </SelectTrigger>
@@ -256,7 +294,7 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 </div>
                 <div>
                     <Label className="text-md">Sexo</Label>
-                    <Select name="sex" required>
+                    <Select name="sex" required defaultValue={pet?.sex}>
                         <SelectTrigger className="mt-2 w-full">
                             <SelectValue placeholder="Selecione uma opção" />
                         </SelectTrigger>
@@ -268,7 +306,12 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 </div>
                 <div>
                     <Label className="text-md">É castrado?</Label>
-                    <RadioGroup name="castrated" className="mt-2" required>
+                    <RadioGroup
+                        name="castrated"
+                        className="mt-2"
+                        required
+                        defaultValue={pet?.castrated !== undefined ? (pet.castrated ? "true" : "false") : undefined}
+                    >
                         <div className="flex items-center gap-3">
                             <RadioGroupItem id="castratedY" value="true" />
                             <Label htmlFor="castratedY">Sim</Label>
@@ -281,7 +324,12 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 </div>
                 <div>
                     <Label className="text-md">Disponível para adoção?</Label>
-                    <RadioGroup name="available" className="mt-2" required>
+                    <RadioGroup
+                        name="available"
+                        className="mt-2"
+                        required
+                        defaultValue={pet?.available !== undefined ? (pet.available ? "true" : "false") : undefined}
+                    >
                         <div className="flex items-center gap-3">
                             <RadioGroupItem id="availableY" value="true" />
                             <Label htmlFor="availableY">Sim</Label>
@@ -294,7 +342,7 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 </div>
                 <div>
                     <Label className="text-md">Gasto estimado mensal</Label>
-                    <Select name="expenseRange" required>
+                    <Select name="expenseRange" required defaultValue={pet?.expenseRange}>
                         <SelectTrigger className="mt-2 w-full">
                             <SelectValue placeholder="Selecione uma opção" />
                         </SelectTrigger>
@@ -308,7 +356,12 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 </div>
                 <div>
                     <Label className="text-md">É um pet ativo?</Label>
-                    <RadioGroup name="isActive" className="mt-2" required>
+                    <RadioGroup
+                        name="isActive"
+                        className="mt-2"
+                        required
+                        defaultValue={pet?.isActive !== undefined ? (pet.isActive ? "true" : "false") : undefined}
+                    >
                         <div className="flex items-center gap-3">
                             <RadioGroupItem id="isActiveY" value="true" />
                             <Label htmlFor="isActiveY">Sim</Label>
@@ -321,7 +374,14 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                 </div>
                 <div>
                     <Label className="text-md">É bom com crianças?</Label>
-                    <RadioGroup name="isGoodWithKids" className="mt-2" required>
+                    <RadioGroup
+                        name="isGoodWithKids"
+                        className="mt-2"
+                        required
+                        defaultValue={
+                            pet?.isGoodWithKids !== undefined ? (pet.isGoodWithKids ? "true" : "false") : undefined
+                        }
+                    >
                         <div className="flex items-center gap-3">
                             <RadioGroupItem id="isGoodWithKidsY" value="true" />
                             <Label htmlFor="isGoodWithKidsY">Sim</Label>
@@ -398,13 +458,14 @@ function FormRegisterPet({ onClose }: { onClose: () => void }) {
                     </div>
                 </div>
             </div>
-            <Button>Cadastrar</Button>
+            <Button>{pet ? "Salvar" : "Cadastrar"}</Button>
         </form>
     );
 }
 
 function ActionsCellComponent({ row }: CellContext<ManagedPet, unknown>) {
     const pet = row.original;
+    const [editPetFormOpen, setEditPetFormOpen] = useState(false);
     const DeletePetMutation = useMutation({
         mutationFn: async (petId: string) => {
             alert(`Deleting pet with ID: ${petId}`);
@@ -413,7 +474,7 @@ function ActionsCellComponent({ row }: CellContext<ManagedPet, unknown>) {
 
     return (
         <div className="flex gap-2">
-            <Dialog>
+            <Dialog open={editPetFormOpen} onOpenChange={setEditPetFormOpen}>
                 <DialogTrigger asChild>
                     <Button className="aspect-square cursor-pointer" variant="outline" size="icon">
                         <PencilIcon />
@@ -421,10 +482,12 @@ function ActionsCellComponent({ row }: CellContext<ManagedPet, unknown>) {
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Editar pet</DialogTitle>
+                        <DialogTitle>Edição de pet</DialogTitle>
                     </DialogHeader>
+                    <FormRegisterPet onClose={() => setEditPetFormOpen(false)} pet={pet} />
                 </DialogContent>
             </Dialog>
+
             <Dialog>
                 <DialogTrigger asChild>
                     <Button className="aspect-square cursor-pointer" variant="outline" size="icon">

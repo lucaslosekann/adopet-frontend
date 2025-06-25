@@ -79,8 +79,7 @@ export const getPet = async (petId: string) => {
     const response = await instance.get<Pet>(`/pets/${petId}`);
     return response.data;
 };
-
-export const registerPet = async (data: {
+type CreatePetPayload = {
     formerName: string;
     dateOfBirth: string;
     species: string;
@@ -93,8 +92,15 @@ export const registerPet = async (data: {
     isActive: boolean;
     isGoodWithKids: boolean;
     sex: string;
-}) => {
+};
+
+export const registerPet = async (data: CreatePetPayload) => {
     const response = await instance.post(`/pets`, data);
+    return response.data;
+};
+
+export const editPet = async ({ id, ...data }: CreatePetPayload & { id: string }) => {
+    const response = await instance.put(`/pets/${id}`, data);
     return response.data;
 };
 
