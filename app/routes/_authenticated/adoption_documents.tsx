@@ -11,9 +11,11 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { adoptionRequest } from "../../lib/api";
 import { useLocation, useNavigate } from "react-router";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 export default function AdoptionDocuments() {
     const { state } = useLocation();
+    const { updateUserData } = useAuthContext();
     const navigate = useNavigate();
     const [rgFile, setRgFile] = React.useState<File | null>(null);
     const rgFileInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -22,11 +24,12 @@ export default function AdoptionDocuments() {
 
     const SubmitAdoptionRequestMutation = useMutation({
         mutationFn: adoptionRequest,
-        onSuccess: () => {
+        onSuccess: async () => {
             toast.success("Documentos enviados com sucesso! Aguarde a análise.");
             setRgFile(null);
             setResidenceProofFile(null);
-            navigate("/document-analysis");
+            await updateUserData();
+            navigate("/adoption-status");
         },
         onError: (error: any) => {
             let message = "Ocorreu um erro ao submeter sua solicitação de adoção. Por favor, tente novamente.";

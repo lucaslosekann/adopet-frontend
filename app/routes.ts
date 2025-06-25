@@ -4,8 +4,7 @@ export default [
     layout("./routes/_authenticated/authenticated-layout.tsx", [
         route("profile", "./routes/_authenticated/adopter_profile.tsx"),
         route("documents-adoption", "./routes/_authenticated/adoption_documents.tsx"),
-        route("document-analysis", "./routes/_authenticated/doc_analysis.tsx"),
-        route("approved-adoption", "./routes/_authenticated/approved_adoption.tsx"),
+        route("adoption-status", "./routes/_authenticated/adoption_status.tsx"),
     ]),
     layout("./routes/_open/open-layout.tsx", [
         index("./routes/_open/_index.tsx"),

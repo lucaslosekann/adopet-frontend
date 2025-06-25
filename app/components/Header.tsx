@@ -53,15 +53,22 @@ export default function Header() {
                             <DropdownMenuItem onClick={() => navigate("/search")}>Pesquisar</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => navigate("/faq")}>FAQ</DropdownMenuItem>
                             {isAuthenticated ? (
-                                <DropdownMenuItem
-                                    onClick={() => {
-                                        isAuthenticated && !user.Ong
-                                            ? navigate("/profile")
-                                            : navigate(`/ong/${user.Ong?.id}`);
-                                    }}
-                                >
-                                    Perfil
-                                </DropdownMenuItem>
+                                <>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            isAuthenticated && !user.Ong
+                                                ? navigate("/profile")
+                                                : navigate(`/ong/${user.Ong?.id}`);
+                                        }}
+                                    >
+                                        Perfil
+                                    </DropdownMenuItem>
+                                    {user.Adoption?.length ? (
+                                        <DropdownMenuItem asChild>
+                                            <Link to={"/adoption-status"}>Sua última adoção</Link>
+                                        </DropdownMenuItem>
+                                    ) : null}
+                                </>
                             ) : (
                                 <></>
                             )}
@@ -69,7 +76,6 @@ export default function Header() {
                             {isAuthenticated && user.Ong ? (
                                 <div>
                                     <DropdownMenuItem onClick={() => navigate("/manage/pets")}>
-                                        {" "}
                                         Gerenciar Pets
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => navigate("/manage/adoption")}>

@@ -29,6 +29,9 @@ export type User = {
     Ong?: {
         id: string;
     };
+    Adoption?: {
+        status: "PENDING" | "APPROVED" | "REJECTED";
+    }[];
 };
 
 type RegisterAdoptantData = {
@@ -56,6 +59,7 @@ export type AuthContextProps = {
     login: (email: string, password: string, rememberMe: boolean) => void;
     registerONG: (cnpj: string, pixKey: string, email: string, password: string) => void;
     registerAdoptant: (data: RegisterAdoptantData) => void;
+    updateUserData: () => Promise<void>;
     logout: () => void;
     loading: boolean;
     user: User;
@@ -193,6 +197,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await RegisterAdoptantMutation.mutateAsync(data);
     }, []);
 
+    const updateUserData = useCallback(async () => {
+        const data = await getMe();
+        setUser(data);
+    }, []);
+
     const logout = useCallback(async () => {
         navigate("/login");
         setUser(null);
@@ -209,6 +218,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 logout,
                 registerONG,
                 registerAdoptant,
+                updateUserData,
             }}
         >
             {children}
