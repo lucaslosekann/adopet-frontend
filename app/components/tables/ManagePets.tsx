@@ -12,6 +12,7 @@ import {
     getSpecies,
     registerPet,
     removePetImage,
+    type Species,
 } from "~/lib/api";
 import { DateTime } from "luxon";
 import {
@@ -434,7 +435,7 @@ function FormRegisterPet({ onClose, pet }: { onClose: () => void; pet?: ManagedP
                         {specie ? (
                             <Combobox
                                 items={
-                                    [...(SpeciesQuery.data ?? []), ...addedSpecies]
+                                    [...addedSpecies, ...(SpeciesQuery.data ?? [])]
                                         ?.find((v) => v.name === specie)
                                         ?.Breed.map((s) => ({ value: s.name, label: s.name })) ?? []
                                 }
@@ -445,8 +446,19 @@ function FormRegisterPet({ onClose, pet }: { onClose: () => void; pet?: ManagedP
                                 placeholder="Selecione uma raça"
                                 onAddButtonClicked={(newValue) => {
                                     setAddedSpecies((old) => {
-                                        return old.map((v: any) => {
+                                        let dataToMap = old;
+                                        if (!dataToMap.find((v) => v.name == specie)) {
+                                            const existingInDb = (SpeciesQuery.data ?? []).find(
+                                                (v) => v.name == specie,
+                                            );
+                                            if (existingInDb) {
+                                                dataToMap = [...old, existingInDb];
+                                            }
+                                        }
+
+                                        const newArray: Species[] = dataToMap.map((v: Species) => {
                                             if (v.name != specie) return v;
+
                                             return {
                                                 name: specie,
                                                 Breed: [
@@ -457,6 +469,8 @@ function FormRegisterPet({ onClose, pet }: { onClose: () => void; pet?: ManagedP
                                                 ],
                                             };
                                         });
+
+                                        return structuredClone(newArray);
                                     });
                                     setBreed(newValue);
                                 }}

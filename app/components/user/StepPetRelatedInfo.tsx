@@ -64,23 +64,23 @@ export default function StepPetRelatedInfo({ prevStep }: { prevStep: () => void 
                             options={[
                                 {
                                     label: "Cachorro",
-                                    value: "dog",
+                                    value: "Cachorro",
                                 },
                                 {
                                     label: "Gato",
-                                    value: "cat",
+                                    value: "Gato",
                                 },
                                 {
                                     label: "Ave",
-                                    value: "bird",
+                                    value: "Ave",
                                 },
                                 {
                                     label: "Coelho",
-                                    value: "rabbit",
+                                    value: "Coelho",
                                 },
                                 {
                                     label: "Réptil",
-                                    value: "reptile",
+                                    value: "Réptil",
                                 },
                             ]}
                             placeholder="Animais"
