@@ -1,6 +1,6 @@
-import { Outlet, useLocation, useNavigate } from 'react-router';
-import { useAuthContext } from '../../contexts/AuthContext';
-import { useEffect } from 'react';
+import { Outlet, useLocation, useNavigate } from "react-router";
+import { useAuthContext } from "../../contexts/AuthContext";
+import { useEffect } from "react";
 export function Layout({ children }: { children: React.ReactNode }) {
     return <div>{children}</div>;
 }
@@ -12,7 +12,6 @@ export default function App() {
 
     useEffect(() => {
         if (!isAuthenticated && !loading) {
-            // console.log(loading, isAuthenticated, user, window.location.href, state);
             navigate(`/login?to=${window.location.pathname}&state=${JSON.stringify(state)}`);
         }
     }, [isAuthenticated, loading, state]);

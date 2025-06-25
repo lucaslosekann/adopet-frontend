@@ -26,7 +26,6 @@ export default function Header() {
                         <Button
                             className="bg-white text-background-secondary h-8"
                             onClick={() => {
-                                console.log("saindo");
                                 logout();
                                 navigate("/login");
                             }}

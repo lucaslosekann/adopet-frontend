@@ -21,11 +21,12 @@ export default function adoption_profile() {
         enabled: !!ongId,
     });
 
-    console.log(PetQuery.data);
-
     if (!PetQuery.data) {
         return null;
     }
+
+    const anos = Math.floor(Math.abs(DateTime.fromISO(PetQuery.data.dateOfBirth).diffNow("years").years));
+    const meses = Math.floor(Math.abs(DateTime.fromISO(PetQuery.data.dateOfBirth).diffNow("month").months));
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -40,7 +41,7 @@ export default function adoption_profile() {
 
                 <div className="flex flex-col md:flex-row gap-10 mt-10 items-start">
                     <div className="flex flex-col justify-center w-full md:w-[40%] gap-20">
-                        <div className="">
+                        <div>
                             <Carousel
                                 opts={{
                                     align: "center",
@@ -72,13 +73,13 @@ export default function adoption_profile() {
                                 <CarouselNext />
                             </Carousel>
                         </div>
-                        <div className="transform transition-transform duration-300 hover:scale-103">
+                        <div className="transform transition-transform duration-300 hover:scale-105">
                             <Link
-                                className="bg-background-secondary text-white font-secondary text-6xl px-8 py-8 cursor-pointer rounded-xl shadow-md hover:shadow-lg"
+                                className="bg-background-secondary align-baseline text-white font-secondary text-6xl px-8 py-8 cursor-pointer rounded-xl shadow-md hover:shadow-lg"
                                 to="/documents-adoption"
                                 state={{ petId: PetQuery.data.id, petName: PetQuery.data.formerName }}
                             >
-                                ADOTAR {PetQuery.data.formerName}
+                                ADOTAR
                             </Link>
                         </div>
                     </div>
@@ -95,13 +96,7 @@ export default function adoption_profile() {
                         </div>
                         <div>
                             <p>Idade</p>
-                            <p className="text-black font-medium">
-                                {" "}
-                                {Math.floor(
-                                    Math.abs(DateTime.fromISO(PetQuery.data.dateOfBirth).diffNow("years").years),
-                                )}{" "}
-                                anos
-                            </p>
+                            <p className="text-black font-medium">{anos ? anos + " anos" : meses + " meses"}</p>
                         </div>
                         <div>
                             <p>Porte</p>
